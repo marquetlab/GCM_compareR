@@ -1,0 +1,13 @@
+---
+output: html_document
+---
+
+Ideas for selecting GCMs from this figure:
+
+- Get an idea about how do the GCMs relate to each other. Those on the upper-left can be seen as "cold-humid" models, those on the upper-right as "warm-humid", on the bottom-left as "cold-dry" and on the bottom-right as "warm-dry".
+
+- Point colors separate GCMs that are within a confidence level of 95% in respect to the average precitions (blue) and those that are not (red). Red GCMs tend to have large differences from these averages, and you might want to treat them carefully for your particular study area.
+
+- One approach might be to select a few GCMs that capture well the spread of conditions that are represented in the dataset. For instance, you could pick a model from each quadrant, and maybe one close to the center. Picking them from the subset of blue GCMs might be a good idea (but beware that these "outliers" might actually be right, it is always worth reading the literature!)
+
+- Another approach might be to select GCMs that are close to average predictions (central).

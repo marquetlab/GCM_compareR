@@ -1,0 +1,10 @@
+---
+output: html_document
+---
+
+## Development
+
+The app has been developed by Javier Fajardo, Derek Corcoran, Patrick Roehrdanz, Lee Hannah and Pablo Marquet in <a href = "http://marquet.cl/" target = "_blank">Marquet Lab</a> in Pontificia Universidad Católica de Chile, in Santiago de Chile. It was built as part of the <a href = "http://www.sparc-website.org/" target = "_blank">Spatial Planning for Protected Areas in Response to Climate Change initiative (SPARC)</a> project, a GEF initiative leaded by Conservation International (CI), and Instituto de Ecología y Biodiversidad (IEB) in Chile.
+
+_gcmcompareR_ is a is a product of the _Spatial Planning for Protected Areas in Response to Climate Change initiative (SPARC)_ from _Conservation International (CI)_ and _the Global Environmental Facility (GEF)_. Find more information about the project on its <a href = "http://www.sparc-website.org/" target = "_blank">website</a>
+

@@ -1,0 +1,28 @@
+---
+title: "Intro tab"
+author: "Javier Fajardo"
+date: "21/5/2018"
+output: html_document
+---
+
+### Workflow
+
+This web App is designed to work in three steps. Each step can be found in a separate tab.
+
+**1**: *Definition of scenario*: 
+
+To start, select the GCMs that you want to compare, define a scenario of climate change, and select a study area. The options include:
+
+- GCMs to compare
+- Climate change scenario: Select a future year, a RCP scenario, and a data resolution.
+- Select a type of comparison. Two posibilities are currently available: (a) compare one variable against another variable, and (b) compare two groups of variables. We advise comparing temperature against precipitation variables. If groups of variables are going to be compared, we additionally recommend including within a group variables that are modulated in a similar fashion (e.g. in all variables higher is more and smaller is less). This will make easier the interpretation of the results. Also, when only single variables are compared, results can be produced showing the real values of the variables. Otherwise, they are combined in order to combine variables whitin a group.
+
+- Study area (...)
+
+**2**: *Main figure and table*: 
+
+**3**: *Maps*
+
+**4**: *Download a report*
+
+You will find further assistance within each tab.

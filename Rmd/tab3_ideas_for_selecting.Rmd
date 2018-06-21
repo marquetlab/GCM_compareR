@@ -1,0 +1,10 @@
+---
+title: "Description Figure and table"
+output: html_document
+---
+
+##### Ideas for selecting a subset of GCMs
+
+- One approach is to select a few **GCMs that capture well the spread of conditions that are represented in the dataset**. For instance, you could pick a model from each quadrant, and maybe one close to the center. Picking them from the subset of blue GCMs might be a good idea (but beware that these "outliers" might actually be right, it is always worth reading the literature!)
+
+- Another approach might be to select **CMs that are close to average predictions** (in central positions).

@@ -1,0 +1,10 @@
+---
+title: "Description Delta GCMs"
+output: html_document
+---
+
+##### Description of **Delta GCMs**
+
+Delta GCM maps present for each pixel the difference between the layer in future scenario and the same pixel under current climatic conditions. Then, positive values show a positive change in the prediction, and a negative value a negative change.
+
+If you want to explore some of these variables in more detail, move forward to the **Explore in detail** tab. 

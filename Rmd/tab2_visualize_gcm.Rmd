@@ -1,0 +1,12 @@
+---
+title: "Description Visualize GCMs"
+output: html_document
+---
+
+##### Description of **Visualize GCMs**
+
+These maps show all selected GCMs for a climate change scenario with a common variable and color scale. Also, the first two maps for each bioclimatic layer are the baseline scenario (current climatic conditions) and the ensemble of the mean values among all GCMs.
+
+This tab infors about the changes in the variables in future scenarios compared to the current climate. Also, it can be used to detect differences in the predictions between different GCMs. However, the tab **Delta GCMs** is more useful for this purpose.
+
+If you want to explore some of the variables in more detail, move forward to the **Explore in detail** tab. 

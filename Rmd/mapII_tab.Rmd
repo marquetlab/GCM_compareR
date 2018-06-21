@@ -1,0 +1,16 @@
+---
+title: "mapII_tab"
+author: "Javier Fajardo"
+date: "21/5/2018"
+output: html_document
+---
+
+#### Interpretation of maps
+
+The maps on the right represent how different is each selected GCMs from the average prediction among GCMs for each pixel (difference to mean ensemble), for each bioclimatic variable selected.
+
+Positive values indicate the pixel has a value for the variable that is bigger than the average prediction, and viceversa for negative values. This way, you can see how GCMs deviate from ensemble predictions across the study area. Sometimes, this will lead you to detect GCMs whose pattern is extremelly different to ensemble predictions.
+
+Download the images by right-clicking on them and choosing "Save as...".
+
+Currently, differences to ensemble are rescaled. 

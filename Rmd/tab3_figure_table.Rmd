@@ -1,0 +1,10 @@
+---
+title: "Description Figure and table"
+output: html_document
+---
+
+##### Description of **Variance in projections**
+
+The figure and table shown here present the variations found between the different GCMs projections. A **mean ensemble** prediction is created for each bioclimatic variable, and the difference between each GCM and this ensemble are calculated for all pixels and combined according to the groups made in the scenario definition tab to obtain a single value of how different is each GCM from the ensemble.
+
+If you selected to display temperature variables in the x-axis and precipitation on the y-axis (as default), GCMs on the top-left quadrant are models that have, on average, **colder-wetter projections** than the average; GCMs on the top-right are **warm-wet**, on the bottom-left are **cold-dry** and on the bottom-right are **warm-dry**.

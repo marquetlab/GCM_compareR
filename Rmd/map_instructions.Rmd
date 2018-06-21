@@ -1,0 +1,32 @@
+---
+title: "Map Instructions"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+#### Instructions to define a climate change scenario and study area
+
+**Define a scenario**
+
+Use the options on the left to define your climate change scenario.
+
+- Select a future *year*.
+
+- Select a <a href = "https://en.wikipedia.org/wiki/Representative_Concentration_Pathways" target = "_blank">Representative Concentration Pathways</a> (*RCP*). RCPs are emission scenarios that determine scenarios of modulated changes. 
+
+- If you want to change default bioclimatic variables to compare, clic on *Bioclimatic variabesl (change default)* to unfold the variable names. Pick as many as you want, but at least one temperature variable and one precipitation. If you pick 1+1 variables, the app will compare them directly. On the contrary, if you select more 2 or more temperature or precipitation variables, the app will combine them to produce a figure of "accumulated" temperature variance against "accumulated" precipitation variance.
+
+- Likewise, click *Global Circulatio Models (unselect)* to unfold options. Select the GCMs that you desire to compare.
+
+- Click *Data resolution* to select your prefered resolution. Beware that computing times can get long if a small resolution is used. We recommend starting with the coarser resolution, and then move to smaller ones.
+
+
+After your scenario is defined, select your study area. There are two options for doing this:
+
+- You can draw a rectangle that includes you area of interest. For doing so, click the square icon on the upper left of the map and draw the rectangle over the map. *Select extent on the map* must be selected for this option to work.
+
+- You can also introduce the names of the country or countries in your study area. Select *Enter country name(s)* to use this option.
+
+When both the scenario and your study area have been defined, clic **Analyze** to start the calculations.
+

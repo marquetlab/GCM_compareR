@@ -1,0 +1,12 @@
+---
+title: "mapI_tab"
+author: "Javier Fajardo"
+date: "21/5/2018"
+output: html_document
+---
+
+#### Interpretation of maps
+
+The maps on the right represent the bioclimatic variables for the GCMs you have selected to compare. In addition, the first plot is the *baseline* (current version of the bioclimatic variable, from WorldClim v1.4).
+
+All maps are ploted using the same scale, so differences and patterns in them can be identified.

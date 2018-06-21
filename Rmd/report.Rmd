@@ -1,0 +1,52 @@
+---
+title: "Downloadable report GCM comparer"
+date: "`r format(Sys.time(), '%d/%m, %Y')`"
+output: pdf_document
+params:
+  Year: NA
+  rcp: NA
+  Variables: NA
+  maptype: NA
+  Coords: NA
+  plot_sc: NA
+  plot_delta: NA
+  plot_uns: NA
+  map_gcm: NA
+  map_delta: NA
+  map_dif: NA
+---
+
+## Parameters used for the analysis
+
+This report was automatically generated with the gcmcompareR shiny app, using models proyected for the year `r params$Year`, and the `r params$rcp` scenario. The bioclimatic variables used for calculating the outcome shown in this report were `r params$Variables`. The geografic area was chosen using the `r ifelse(params$maptype == "map_draw", "rectangle drawing", ifelse(params$maptype == "map_country", "country selection", "coordinates box"))` tool of the app. The coordinates selected were `r params$Coords`
+
+## Results
+
+
+
+```{r}
+params$plot_sc
+```
+
+
+```{r}
+params$plot_uns
+```
+
+```{r}
+params$plot_delta
+```
+
+```{r, fig.width = 10, fig.height = 10}
+params$map_gcm
+```
+
+```{r, fig.width = 10, fig.height = 10}
+params$map_delta
+```
+
+```{r, fig.width = 10, fig.height = 10}
+params$map_dif
+```
+
+

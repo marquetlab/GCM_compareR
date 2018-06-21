@@ -1,0 +1,17 @@
+---
+title: "GCMs info"
+author: "Javier Fajardo"
+date: "30/5/2018"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+
+GCMs_details <- read_csv("../clim_data/GCMs_details.csv")
+
+GCMs_details %>% 
+  knitr::kable("html")
+
+```
+

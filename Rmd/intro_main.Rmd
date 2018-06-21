@@ -1,0 +1,32 @@
+---
+title: "Intro_main"
+author: "Javier Fajardo"
+date: "21/5/2018"
+output: html_fragment
+bibliography: biblio.bib
+---
+
+#### GCM compareR
+
+__GCM compareR__ is an web application that assists the selection of Global Circulation Models (GCMs) for climate change research.
+
+This application is written in R and published as an app with the web app development package shiny. The code of this app can be find in the projects github.
+
+Projections to future scenarios of climate change of species distribution models rely on downscaled Global Circulation Models (GCMs), which provide interpretations of future changes in climate. A number of GCMs is available from ~30 research centres worldwide. 
+
+While best practice is to project to all available GCMs, researchers are typically limited by temporal and computer capabilities to use a subset of these models. However, there is not always definitive information regarding which GCMs perform better, especially for less studied regions of the world such as the tropics. Then, researchers are usually in the situation of selecting a subset of GCMs without too much information about them, and, as a result, the choice of certain models usually is directed by those that had been selected previously in the literature (which, at their time, where selected without the same information).
+
+__GCM compareR__ comes to fill this gap and assist researchers in thoughtfully choosing a subset of GCMs.
+
+
+## Climatic data
+
+This application uses downscaled climate data published by the <a href = "http://ccafs-climate.org/" target = "_blank">Research Program on Climate Change, Agriculture and Food Security (CCAFS)</a>. All the raster data used by GCM compareR is available from their package [@Chamberlain2017].
+
+#### Contact us
+
+Please, email derek.corcoran.barrios@gmail.com with any question of create an issue on github.
+
+#### References
+
+

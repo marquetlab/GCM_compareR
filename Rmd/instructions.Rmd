@@ -1,0 +1,43 @@
+---
+output: html_fragment
+bibliography: biblio.bib
+---
+
+###**How to use:**
+
+**1)** Select the parameters that describe a climate change scenario in the tab _Scenario _: 
+
+
+#### Global Circulation Models (GCMs)
+
+- <a href = "http://www.ipcc-data.org/guidelines/pages/gcm_guide.html" target = "_blank">Global Circulation Models</a>
+
+
+- Year
+
+- <a href = "https://en.wikipedia.org/wiki/Representative_Concentration_Pathways" target = "_blank">Representative Concentration Pathways</a>
+
+- <a href = "http://www.worldclim.org/bioclim" target = "_blank">bioclimatic variables</a>
+
+- <a href = "http://www.ipcc-data.org/guidelines/pages/gcm_guide.html" target = "_blank">Global Circulation Models</a>
+
+- and a study area of your interest (clic _Apply extent_ to set the extent). 
+
+When you are done, press the **START ANALYSIS** button.
+
+**2)** Wait for a while for your results to appear under the tab **Results**. There you will find:
+
+- **Compare results**: A **plot of temperature vs precipitation**, where you can see how your GCMs spread in relation to each other. You will find instructions on the right hand side with ideas about how to select a subset of GCMs from this graphic. This tab also includes the raw data behind the plot as a table that contains the values of temperature, precipitation and distance to central coordinates for each GCM. Both results can be downloaded to your computer.
+
+- **Explore GCMs**: Maps to explore the spatial variation in **each variable of the GCMs selected**. GCMs raw variables are displayed next to each other with a common color scale to help finding spatial patterns in their variation.
+
+- **Spatial comparison**: Maps showing the spatial variation in **differences for each GCM towards the all-GCMs ensemble**. Here, the values showed for each GCM are the difference between the layer value and the average value predicted across all GCMs (ensemble). Raster values are in the same units as the bioclimatic layers, so it is possible to find positive and negative deviations and their magnitude for each GCM in respect to the ensemble. For instance, considering mean annual temperature as an example, this plots will show you which GCMs are warmer or colder than the average predictions and in which parts of the study area. Also, this maps have the potential to help detecting which GCMs present extreme values over a certain part of the study area.
+
+**3)** A safe recipe to select GCMs using this App is:
+
+- Start by searching bibliography for your study area. Learn if there are particular GCMs known to be biased for your region of interest, and remove them from the pool.
+
+- Use the app for remaining GCMs, and take a look at the plot in the **Compare results** tab. Find those GCMs that differ a lot from average predictions outside confidence levels, and re-check for information about them. Use the plots in the **Explore GCMs** and **Spatial comparison** tabs searching for spatial patterns of extreme values in those GCMs. Remove them if you have clues that they might not be suited for your study area. 
+
+- Analyse again using only a subset of the GCMs not containing those models. Then, pick a number of GCMs using the **temperature vs precipitation plot** in **Compare results**.
+

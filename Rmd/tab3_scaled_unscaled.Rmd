@@ -1,0 +1,10 @@
+---
+title: "Description scaled-unscaled"
+output: html_document
+---
+
+###### **To scaled or not to scale**
+
+The scaled figure is useful to detect patterns on your models. On the other hand, it will not inform you about the magnitude of differences.
+
+To the contrary, the unscaled figure is not as good to see how all GCMs spread, but it can give you information about the size of changes that each model displays. Notice that this option is only available when 2 single bioclimatic variables are compared.
