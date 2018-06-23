@@ -1,10 +1,16 @@
 ---
-output: html_document
+output: html_fragment
+bibliography: biblio.bib
 ---
 
-## Development
+#### Development
 
-The app has been developed by Javier Fajardo, Derek Corcoran, Patrick Roehrdanz, Lee Hannah and Pablo Marquet in <a href = "http://marquet.cl/" target = "_blank">Marquet Lab</a> in Pontificia Universidad Católica de Chile, in Santiago de Chile. It was built as part of the <a href = "http://www.sparc-website.org/" target = "_blank">Spatial Planning for Protected Areas in Response to Climate Change initiative (SPARC)</a> project, a GEF initiative leaded by Conservation International (CI), and Instituto de Ecología y Biodiversidad (IEB) in Chile.
+The app has been developed by Javier Fajardo, Derek Corcoran, Patrick Roehrdanz, Lee Hannah and Pablo Marquet in <a href = "http://marquet.cl/" target = "_blank">Marquet Lab</a> in Pontificia Universidad Católica de Chile, in Santiago de Chile. It was built as part of the <a href = "http://www.sparc-website.org/" target = "_blank">Spatial Planning for Protected Areas in Response to Climate Change initiative (SPARC)</a> project, a GEF initiative leaded by Conservation International (CI), and with the support of <a href = "http://ieb-chile.cl/" target = "_blank">Instituto de Ecología y Biodiversidad (IEB)</a> in Chile.
 
-_gcmcompareR_ is a is a product of the _Spatial Planning for Protected Areas in Response to Climate Change initiative (SPARC)_ from _Conservation International (CI)_ and _the Global Environmental Facility (GEF)_. Find more information about the project on its <a href = "http://www.sparc-website.org/" target = "_blank">website</a>
+__gcmcompareR__ is a product of the _Spatial Planning for Protected Areas in Response to Climate Change initiative (SPARC)_ from _Conservation International (CI)_ and _the Global Environmental Facility (GEF)_. Find more information about the project on its <a href = "http://www.sparc-website.org/" target = "_blank">website</a>.
 
+#### Climatic data
+
+This application uses downscaled climate data published by the <a href = "http://ccafs-climate.org/" target = "_blank">Research Program on Climate Change, Agriculture and Food Security (CCAFS)</a>. All the raster data used by GCM compareR is available from their package [@Chamberlain2017].
+
+#### References
