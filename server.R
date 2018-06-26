@@ -363,6 +363,7 @@ server <- function(input, output) {
         unique %>% 
         extent
       rvs$polySelXY <- xy
+      rvs$saved_bbox <- xy
     }
     
     # bounding-box extent
@@ -393,6 +394,7 @@ server <- function(input, output) {
                               input$xmax,
                               input$ymin,
                               input$ymax)
+      rvs$saved_bbox <- c(input$xmin, input$xmax, input$ymin, input$ymax)
     }
     
     
@@ -442,6 +444,7 @@ server <- function(input, output) {
       selected_countries <- selected_countries %>% 
         st_crop(xmin = xmin(xy), xmax = xmax(xy), ymin = ymin(xy), ymax = ymax(xy))
       
+      rvs$saved_bbox <- c(xmin(xy), xmax(xy), ymin(xy), ymax(xy))
       rvs$polySelXY <- selected_countries
     }
     
@@ -490,6 +493,7 @@ server <- function(input, output) {
       selected_biomes <- selected_biomes %>% 
         st_crop(xmin = xmin(xy), xmax = xmax(xy), ymin = ymin(xy), ymax = ymax(xy))
       
+      rvs$saved_bbox <- c(xmin(xy), xmax(xy), ymin(xy), ymax(xy))
       rvs$polySelXY <- selected_biomes
     }
     
@@ -538,6 +542,7 @@ server <- function(input, output) {
       selected_ecorregions <- selected_ecorregions %>% 
         st_crop(xmin = xmin(xy), xmax = xmax(xy), ymin = ymin(xy), ymax = ymax(xy))
       
+      rvs$saved_bbox <- c(xmin(xy), xmax(xy), ymin(xy), ymax(xy))
       rvs$polySelXY <- selected_ecorregions
     }
   })
@@ -2147,33 +2152,42 @@ server <- function(input, output) {
     # For PDF output, change this to "report.pdf"
     filename = "report.pdf",
     content = function(file) {
-      # Copy the report file to a temporary directory before processing it, in
-      # case we don't have write permissions to the current working dir (which
-      # can happen when deployed).
-      tempReport <- file.path(tempdir(), "report.Rmd")
-      file.copy("Rmd/report.Rmd", tempReport, overwrite = TRUE)
-      
-      # Set up parameters to pass to Rmd document
-      params <- list(Year = input$year_type,
-                     rcp = input$rcp_type,
-                     Variables = input$bio_vars,
-                     maptype = input$extent_type,
-                     Coords = rvs$polySelXY,
-                     plot_uns = rvs$plot_comp_download_unscaled,
-                     plot_delta = rvs$plot_comp_download_deltas,
-                     plot_sc = rvs$plot_comp_download_scaled,
-                     map_gcm = rvs$plot_gcm_pattern,
-                     map_delta = rvs$plot_delta_pattern,
-                     map_dif = rvs$plot_gcm_differences
-      )
-      
-      # Knit the document, passing in the `params` list, and eval it in a
-      # child of the global environment (this isolates the code in the document
-      # from the code in this app).
-      rmarkdown::render(tempReport, output_file = file,
-                        params = params,
-                        envir = new.env(parent = globalenv())
-      )
+      withProgress(message = 'Preparing the report',
+                   detail = NULL,
+                   value = 0, {
+                     incProgress(amount = 0.1, message = 'Recovering all data')
+                     # Copy the report file to a temporary directory before processing it, in
+                     # case we don't have write permissions to the current working dir (which
+                     # can happen when deployed).
+                     tempReport <- file.path(tempdir(), "report.Rmd")
+                     file.copy("Rmd/report.Rmd", tempReport, overwrite = TRUE)
+                     
+                     # Set up parameters to pass to Rmd document
+                     params <- list(Year = input$year_type,
+                                    rcp = input$rcp_type,
+                                    Variables = input$bio_vars,
+                                    maptype = input$extent_type,
+                                    Coords = rvs$saved_bbox,
+                                    countries = input$ext_name_country,
+                                    biomes = input$ext_name_biomes,
+                                    ecoregions = input$ext_name_ecorregions,
+                                    plot_uns = rvs$plot_comp_download_unscaled,
+                                    plot_delta = rvs$plot_comp_download_deltas,
+                                    plot_sc = rvs$plot_comp_download_scaled,
+                                    plot_realuns = rvs$plot_temp_prec_realunscaled,
+                                    map_gcm = rvs$plot_gcm_pattern,
+                                    map_delta = rvs$plot_delta_pattern,
+                                    map_dif = rvs$plot_gcm_differences
+                     )
+                     
+                     # Knit the document, passing in the `params` list, and eval it in a
+                     # child of the global environment (this isolates the code in the document
+                     # from the code in this app).
+                     incProgress(amount = 0.3, message = 'Printing the pdf')
+                     rmarkdown::render(tempReport, output_file = file,
+                                       params = params,
+                                       envir = new.env(parent = globalenv()))
+                   })
     }
   )
   

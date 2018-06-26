@@ -321,10 +321,6 @@ ui <- tagList(
                                       a common variable and color scale. The first two maps for each 
                                       bioclimatic layer are the baseline scenario (current climatic conditions)
                                       and the ensemble of the mean values among all GCMs."),
-                                    p("This tab infors about the changes in the variables in future scenarios
-                                      compared to the current climate. Also, it can be used to detect
-                                      differences in the predictions between different GCMs. However, 
-                                      the tab", HTML("<span id = 'bold'>Delta GCMs</span>"), "is more useful for this purpose."),
                                     
                                     # Visualization options
                                     h5("Visualization options"),
@@ -445,8 +441,9 @@ ui <- tagList(
                                                   conditionalPanel("input.type_scaled_pre_delta == 'no_scaled'",
                                                                    plotlyOutput("plot_temp_prec_no_scaled", height = "100%"),
                                                                    hr(),
-                                                                   uiOutput("tab3_ideas_for_selecting_copy"),
-                                                                   hr(),
+                                                                   # uiOutput("tab3_ideas_for_selecting_copy"),
+                                                                   # hr(),
+                                                                   h5("Table with the underlying data"),
                                                                    tableOutput("comparison_table_no_scaled"))
                                          ),
                                          
@@ -596,9 +593,10 @@ ui <- tagList(
                       p("- Complement the results with information relevant to their interpretation"),
                       p("Make sure to generate each one of the results in all the pages available in
                         the app for them to appear in your report."),
+                      hr(),
                       downloadButton("report", "Generate report",
                                      style="color: #fff; background-color: #57be91; 
-                                     border-color: #2e6da4; font-size:100%; padding-left:10px"))
+                                     border-color: #2e6da4; font-size:140%; padding-left:10px"))
              )
              )
     )
