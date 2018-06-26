@@ -765,16 +765,16 @@ server <- function(input, output) {
   observe({
     n_gcms <- length(input$sel_gcms)
     output$selected_gcms_2_tab <- renderText(
-      glue::glue("{n_gcms} GCMs") %>% message
+      glue::glue("{n_gcms} GCMs") %>% print()
     )
     print_rcp <- input$rcp_type %>% str_replace("rcp", "")
     output$selected_scenario_2_tab <- renderText(
-      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% message
+      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% print()
     )
     type_selected_comparison <- case_when(input$compare_type == "bio_bio" ~ c("bio X bio"),
                                           input$compare_type == "bio_several" ~ "multiple")
     output$selected_comparison_2_tab <- renderText(
-      glue::glue("Comparison: {type_selected_comparison}") %>% message
+      glue::glue("Comparison: {type_selected_comparison}") %>% print()
     )
   })
   
@@ -790,16 +790,16 @@ server <- function(input, output) {
   observe({
     n_gcms <- length(input$sel_gcms)
     output$selected_gcms_pre_tab <- renderText(
-      glue::glue("{n_gcms} GCMs") %>% message
+      glue::glue("{n_gcms} GCMs") %>% print()
     )
     print_rcp <- input$rcp_type %>% str_replace("rcp", "")
     output$selected_scenario_pre_tab <- renderText(
-      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% message
+      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% print()
     )
     type_selected_comparison <- case_when(input$compare_type == "bio_bio" ~ c("bio X bio"),
                                           input$compare_type == "bio_several" ~ "multiple")
     output$selected_comparison_pre_tab <- renderText(
-      glue::glue("Comparison: {type_selected_comparison}") %>% message
+      glue::glue("Comparison: {type_selected_comparison}") %>% print()
     )
   })
   
@@ -1184,16 +1184,16 @@ server <- function(input, output) {
   observe({
     n_gcms <- length(input$sel_gcms)
     output$selected_gcms_fut_tab <- renderText(
-      glue::glue("{n_gcms} GCMs") %>% message
+      glue::glue("{n_gcms} GCMs") %>% print()
     )
     print_rcp <- input$rcp_type %>% str_replace("rcp", "")
     output$selected_scenario_fut_tab <- renderText(
-      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% message
+      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% print()
     )
     type_selected_comparison <- case_when(input$compare_type == "bio_bio" ~ c("bio X bio"),
                                           input$compare_type == "bio_several" ~ "multiple")
     output$selected_comparison_fut_tab <- renderText(
-      glue::glue("Comparison: {type_selected_comparison}") %>% message
+      glue::glue("Comparison: {type_selected_comparison}") %>% print()
     )
   })
   

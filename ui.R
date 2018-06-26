@@ -29,12 +29,18 @@ ui <- tagList(
                '.navbar { background-color: #5bbd92;
                font-family: Arial;
                font-size: 16px;
-               color: #f5f5f5; }',
-               '.navbar-default .navbar-brand {color: #f5f5f5;}'
+               color: #f5f5f5; }'#,
+               # '.navbar-default .navbar-brand {color: #f5f5f5;}'
     ),
     
     # css styles
     tags$head(
+      # Title in navbar
+      tags$style(HTML('.navbar-brand {color: #f5f5f5 !important; font-size: 40px; 
+                      font-family: Lucida Console; padding-left: 85px}')),
+      # navbar text (pages names)
+      tags$style(HTML('.navbar-nav {color: #f5f5f5 !important; font-size: 30px !important;
+                      font-family: Lucida Console}')),
       tags$style(HTML('p{font-size: 16px}')),
       tags$style(HTML('li{font-size: 16px}')),
       tags$style(HTML('#mu_prior{background-color: rgba(27, 158, 119, 0.5);
@@ -272,7 +278,8 @@ ui <- tagList(
                                     
                                     ## Button ANALYZE
                                     fluidRow(
-                                      column(6, h6("Press here when ready:")),
+                                      column(4),
+                                      column(3, h6("Press here when ready:")),
                                       column(1, shiny::actionButton(inputId = "go",
                                                                     label = "ANALYZE",
                                                                     icon = icon("bolt"),
@@ -574,6 +581,25 @@ ui <- tagList(
     #### TAB 4: REPORT
     
     tabPanel(title = "REPORT",
-             downloadButton("report", "Generate report"))
+             mainPanel(
+               column(5),
+               column(7,
+                      h4("Report of the session"),
+                      hr(),
+                      p("In this tab, you can generate a report as a pdf file containing all the
+                        results produced during the session."),
+                      p("This report is intended at 3 things:"),
+                      p("- Assure the repeatability of the analysis, as it will contain all the 
+                        setting that you used to obtain the results"),
+                      p("- Provide you with a full summary of all the results that were obtained
+                        during the session"),
+                      p("- Complement the results with information relevant to their interpretation"),
+                      p("Make sure to generate each one of the results in all the pages available in
+                        the app for them to appear in your report."),
+                      downloadButton("report", "Generate report",
+                                     style="color: #fff; background-color: #57be91; 
+                                     border-color: #2e6da4; font-size:100%; padding-left:10px"))
+             )
+             )
     )
 )
