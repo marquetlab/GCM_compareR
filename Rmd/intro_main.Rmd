@@ -18,6 +18,10 @@ While best practice is to project to all available GCMs, researchers are typical
 
 GCM compareR comes to fill this gap and assist researchers in thoughtfully choosing a subset of GCMs.
 
+#### Citation
+
+How to cite this app: (will appear here)
+
 
 #### Contact us
 

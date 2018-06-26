@@ -5,7 +5,7 @@ date: "21/5/2018"
 output: html_document
 ---
 
-### Workflow
+#### Workflow
 
 This web App is designed to work in three steps. Each step can be found in a separate tab.
 
