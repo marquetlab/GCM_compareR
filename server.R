@@ -756,10 +756,32 @@ server <- function(input, output) {
   })
   
   
+  ####################################################################################
+  ### TAB 2: VISUALIZE GCMs
+  ####################################################################################
+  
+  ################# OPTIONS FOR UI #################
+  ### SELECTED OPTIONS
+  observe({
+    n_gcms <- length(input$sel_gcms)
+    output$selected_gcms_2_tab <- renderText(
+      glue::glue("{n_gcms} GCMs") %>% message
+    )
+    print_rcp <- input$rcp_type %>% str_replace("rcp", "")
+    output$selected_scenario_2_tab <- renderText(
+      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% message
+    )
+    type_selected_comparison <- case_when(input$compare_type == "bio_bio" ~ c("bio X bio"),
+                                          input$compare_type == "bio_several" ~ "multiple")
+    output$selected_comparison_2_tab <- renderText(
+      glue::glue("Comparison: {type_selected_comparison}") %>% message
+    )
+  })
+  
   
   
   ####################################################################################
-  ### TAB 2: VISUALIZE DIFFERENCES WITH PRESENT
+  ### TAB 3: VISUALIZE DIFFERENCES WITH PRESENT
   ####################################################################################
   
   
