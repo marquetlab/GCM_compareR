@@ -33,9 +33,9 @@ world_map <- SpatialPolygonsDataFrame(world_map,
                                       FALSE)
 world_sf <- st_as_sf(world_map)
 biomes <- read_sf("data/biomes.shp")
-# biomes_sp <- readOGR("data", "biomes")
+biomes_sp <- readOGR("data", "biomes")
 ecorregions <- read_sf("data/Ecoregions2017.shp")
-# ecorregions_sp <- readOGR("data", "Ecoregions2017")
+ecorregions_sp <- readOGR("data", "Ecoregions2017")
 
 
 ##############################################################################################################################################################################
@@ -90,6 +90,16 @@ server <- function(input, output) {
   # outputOptions(output, "type_scaled", suspendWhenHidden = FALSE)
   
   
+  # Disable results tab until input$go is used
+  observeEvent(input$go == 1,{
+    
+    if(input$go == 1){#If true enable, else disable
+      js$enabletab("abc")
+    }else{
+      js$disabletab("abc")
+    }
+    
+  })
   
   
   ##################################################
@@ -935,7 +945,7 @@ server <- function(input, output) {
           plotOutput(plotname, height = "100%")
         })
         do.call(tagList, plot_gcm_pattern_ui) %>%      # Convert the list to a tagList
-          withSpinner(type = 5, color = "#9ab899")
+          withSpinner(type = 7, color = "#5fbc93")
         # } else {""}
       })
     })
@@ -1054,7 +1064,7 @@ server <- function(input, output) {
         plotOutput(plotname, height = "100%")
       })
       do.call(tagList, plot_delta_pattern_ui) %>%      # Convert the list to a tagList
-        withSpinner(type = 5, color = "#9ab899")
+        withSpinner(type = 7, color = "#5fbc93")
       # } else {""}
     })
   })
@@ -2024,7 +2034,7 @@ server <- function(input, output) {
                    height = "100%")
       })
       do.call(tagList, plot_gcm_differences_ui) %>%     # Convert the list to a tagList
-        withSpinner(type = 5, color = "#9ab899")
+        withSpinner(type = 7, color = "#5fbc93")
     })
   })
   
@@ -2144,6 +2154,8 @@ server <- function(input, output) {
   })
   
   
+
+  
   ##########################################
   ### Tab 5 -Download report
   ##########################################
@@ -2160,7 +2172,8 @@ server <- function(input, output) {
                      # case we don't have write permissions to the current working dir (which
                      # can happen when deployed).
                      tempReport <- file.path(tempdir(), "report.Rmd")
-                     file.copy("Rmd/report.Rmd", tempReport, overwrite = TRUE)
+                     file.copy(from = "Rmd/report.Rmd", to = tempReport, overwrite = TRUE)
+                     file.copy(from = "Rmd/biblio.bib", to = tempdir(), overwrite = TRUE)  # Copy to that temp directory also bibliography, or it will not by find by render()
                      
                      # Set up parameters to pass to Rmd document
                      params <- list(Year = input$year_type,

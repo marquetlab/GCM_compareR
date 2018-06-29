@@ -12,10 +12,26 @@ library(leaflet.extras)
 ########################################      UI       ######################################################################################################################
 ##############################################################################################################################################################################
 
+##JS Code for enabling and diabling
+jscode <- "shinyjs.disabletab =function(name){
+$('ul li:has(a[data-value= \"selected\"])').addClass('disabled');
+$('ul li:has(a[data-value= \"current\"])').addClass('disabled');
+$('ul li:has(a[data-value= \"future\"])').addClass('disabled');
+$('.nav li.disabled a').prop('disabled',true)
+}
+
+shinyjs.enabletab =function(name){
+$('.nav li.disabled a').prop('disabled',false)
+$('ul li:has(a[data-value= \"selected\"])').removeClass('disabled');
+$('ul li:has(a[data-value= \"current\"])').removeClass('disabled');
+$('ul li:has(a[data-value= \"future\"])').removeClass('disabled');
+} "
+
 
 # Define UI for application that draws a histogram
 ui <- tagList(
-  shinyjs::useShinyjs(),
+  useShinyjs(),
+  extendShinyjs(text = jscode),
   navbarPage(
     theme = shinytheme("paper"),    #"lumen
     id = "navbar",
@@ -116,7 +132,6 @@ ui <- tagList(
              # icon = icon("globe"),
              
              sidebarPanel(
-               
                h4("SELECT A SCENARIO"),
                hr(),
                
@@ -387,7 +402,7 @@ ui <- tagList(
                                                      h5("Maps"),
                                                      p("These maps show the spatial pattern of changes projected by GCMs from 
                                                        current climate (BASELINE). The average ensemble projection across GCMs
-                                                       is also included (ENSEMBLE"),
+                                                       is also included (ENSEMBLE)"),
                                                      h5("Visualization options"),
                                                      radioButtons("add_layer2", "Overlay on maps:",
                                                                   c("Do not overlay anything" = "nothing",
