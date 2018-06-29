@@ -1252,8 +1252,8 @@ server <- function(input, output) {
   
   ################## CALCULATIONS FOR SCATTERPLOT AND TABLE ##################
   
-  observeEvent({input$type_scaled
-    input$type_scaled_pre_delta
+  observeEvent({#input$type_scaled
+    # input$type_scaled_pre_delta
     input$go
   }, {
     req(rvs$clim_ens)
@@ -1401,6 +1401,7 @@ server <- function(input, output) {
                                                                     .[,2:3],
                                                                     lonlat = FALSE)) #%>%
                    # dplyr::arrange(Distance)
+                   rvs$table_realunscaled <- table_realunscaled
                    
                    #############################################################################
                    
@@ -1653,21 +1654,22 @@ server <- function(input, output) {
                      glue::glue("#> (plotly) Creating temp vs prec plot") %>% message
                      ggplotly(rvs$plot_comp_realunscaled, 
                               tooltip = c("GCM", "Distance", "x_axis", "y_axis"),
-                              height = 600) #%>%
-                     # layout(#xaxis = list(scaleanchor = "y",   # iguala escala de ejes
-                     #        #             scaleratio = 1),
-                     #        annotations = list(x = rvs$table_realunscaled$x_axis,    # anotaciones fijas
-                     #                           y = rvs$table_realunscaled$y_axis,
-                     #                           text = rvs$table_realunscaled$GCM,
-                     #                           showarrow = T,
-                     #                           arrowhead = 4,
-                     #                           arrowsize = 0.4,
-                     #                           arrowwidth = 0.4,
-                     #                           textposition = "center left",
-                     #                           opacity = 0.5,
-                     #                           ax = 3,
-                     #                           font = list(family = "Arial",
-                     #                                       size = 10)))
+                              # tooltip = c("GCM", "Distance", "bio_1", "bio_12"),
+                              height = 600) %>%
+                     layout(#xaxis = list(scaleanchor = "y",   # iguala escala de ejes
+                                         # scaleratio = 1),
+                            annotations = list(x = rvs$table_realunscaled$x_axis,    # anotaciones fijas
+                                               y = rvs$table_realunscaled$y_axis,
+                                               text = rvs$table_realunscaled$GCM,
+                                               showarrow = T,
+                                               arrowhead = 4,
+                                               arrowsize = 0.4,
+                                               arrowwidth = 0.4,
+                                               textposition = "center left",
+                                               opacity = 0.5,
+                                               ax = 3,
+                                               font = list(family = "Arial",
+                                                           size = 10)))
                    })
                    
                    
@@ -1911,9 +1913,9 @@ server <- function(input, output) {
                        paste0("Comparison_tableA_", input$year_type, "_", input$rcp_type, ".csv")
                      },
                      content = function(file) {
-                       write.csv(rvs$table_realunscaled %>%
-                                   mutate(confidence95 = Within_circle) %>% 
-                                   dplyr::select(-Within_circle), 
+                       write.csv(rvs$table_realunscaled,# %>%
+                                   # mutate(confidence95 = Within_circle) %>% 
+                                   # dplyr::select(-Within_circle), 
                                  file, row.names = F)
                      }
                    )

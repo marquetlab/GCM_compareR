@@ -517,8 +517,14 @@ ui <- tagList(
                                                        shorter means smaller– should be mixed). In this scaled figure, a 95% confidence level of 
                                                        the ensemble mean is drawn to highlight the models that do not differ larger than these limits
                                                        in their projections."),
-                                                     downloadButton('download_prec_temp_scaled', 'Download figure'),
-                                                     downloadButton('download_comparison_table', 'Download table')),
+                                                     conditionalPanel("input.type_scaled == 'scaled'",
+                                                                      downloadButton('download_prec_temp_scaled', 'Download figure')),
+                                                     conditionalPanel("input.type_scaled == 'unscaled'",
+                                                                      downloadButton('download_prec_temp_realunscaled', 'Download figure')),
+                                                     hr(),
+                                                     downloadButton('download_comparison_table', 'Download table'),
+                                                     downloadButton('download_comparison_table_realunscaled', 'Download table realuns')
+                                                     ),
                                     conditionalPanel("input.future_panel == 'maps_fut_diff'",
                                                      h5("Maps"),
                                                      p("These maps show the spatial distribution of each GCM deviations 
