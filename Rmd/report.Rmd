@@ -18,14 +18,14 @@ params:
   map_gcm: NA
   map_delta: NA
   map_dif: NA
-# bibliography: biblio.bib
+bibliography: biblio.bib
 ---
 
 ## Introduction
 
 This report was automatically generated with the gcmcompareR shiny app.
 
-The app is intended at assisting ecologists, conservationists and policy makers in the process of selecting subsets of GCMs for their specific needs. It includes options to perform analyses inspired in Vano et al. (2015) [@Chamberlain2017], and extend the methods with additional quantitative and qualitative routines that include outputs in the form of scatterplots, tables and a diversity of maps. 
+The app is intended at assisting ecologists, conservationists and policy makers in the process of selecting subsets of GCMs for their specific needs. It includes options to perform analyses inspired in Vano et al. (2015) [@Vano2015], and extend the methods with additional quantitative and qualitative routines that include outputs in the form of scatterplots, tables and a diversity of maps. Please, refer to that citation and information provided within the app and this report to find in the following results the GCMs that suit better the needs of your research.
 
 
 ## Note
