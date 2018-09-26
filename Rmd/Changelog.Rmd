@@ -7,8 +7,15 @@ editor_options:
 
 ### Released versions
 
+#### Version 0.9.2 (Sep 26, 2018)
+- Update in text in all panels from the Intro tab.
+
+***
+
 #### Version 0.9.1 (Aug 21, 2018)
 - Update in tab names.
+
+***
 
 #### Version 0.9 (Aug 21, 2018)
 - Corrected an error where result tabs were disabled after a second use of the ANALYZE! button.
@@ -17,6 +24,8 @@ editor_options:
 - Warnings added about overlap between rectangle selection and countries/biomes/ecoregions.
 - Tab added with information for GCMs (developing institutions, full name, website...).
 - Intro is selected as default tab when starting.
+
+***
 
 #### Version 0.8 (before Aug 21, 2018)
 (This was the first version online shared between authors when sharing the manuscript draft)

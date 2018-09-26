@@ -1,23 +1,78 @@
 
 
 
-<div id="gcm-comparer" class="section level3">
-<h3>GCM compareR</h3>
-<p><strong>GCM compareR</strong> is a web application that assists the selection of Global Circulation Models (GCMs) for climate change research.</p>
-<p>This application is written in R and published as an app with the web app development package shiny. The code of this app can be find in the projects github.</p>
-<p>Projections to future scenarios of climate change of species distribution models rely on downscaled Global Circulation Models (GCMs), which provide interpretations of future changes in climate. A number of GCMs is available from ~30 research centres worldwide.</p>
-<p>While best practice is to project to all available GCMs, researchers are typically limited by temporal and computer capabilities to use a subset of these models. However, there is not always definitive information regarding which GCMs perform better, especially for less studied regions of the world such as the tropics. Then, researchers are usually in the situation of selecting a subset of GCMs without too much information about them, and, as a result, the choice of certain models usually is directed by those that had been selected previously in the literature (which, at their time, where selected without the same information).</p>
-<p>GCM compareR comes to fill this gap and assist researchers in thoughtfully choosing a subset of GCMs.</p>
+<div id="gcm-comparer" class="section level4">
+<h4>GCM compareR</h4>
+<p>GCM compareR is a web application developed to assist ecologists, conservationists and policy makers at understanding climate change scenarios and differences between Global Circulation Models (GCMs), and at assisting the triage of subsets of models in an objective and informed manner. GCM compareR is written in R and uses the web app development package shiny. The code of this app can be find in the project’s github, <a href="https://github.com/marquetlab/GCM_compareR" target="_blank">https://github.com/marquetlab/GCM_compareR</a>.</p>
+<p>The number of GCMs that are accessible to researchers and practitioners has grown large. Concretely, meteorological research centers worldwide have contributed more than 35 different GCMs for four distinct climate change scenarios as part of the Coupled Model Intercomparison Project Phase 5 (CMIP5; <span class="citation">(Taylor, Stouffer, and Meehl 2012)</span>). All these models have shown good performance and skill in predicting historical climatic data, but present differences among them as a result of different sources of uncertainty (including model formulation, resolution and sensitivity to initial conditions, climate noise; <span class="citation">(Flato et al. 2013)</span>). GCMs could be ranked by their skill at specific geographic areas, but models that most accurately predict historic data are not necessarily the most useful for making future climate projections <span class="citation">(Knutti 2008)</span>.</p>
+<p>In practice, best practices when conducting any evaluation advice for using multi-model approaches where differences in GCMs projections are adequantely understood and assessed as uncertainty <span class="citation">(Pierce et al. 2009, <span class="citation">Flato et al. (2013)</span>)</span>. Also, and even though the ideal case would use all available GCMs, researchers are often forced to work with a few selected models for computational restrictions <span class="citation">(Barsugli et al. 2013)</span>. However, the choice of some GCMs and not other has the potential to influence results <span class="citation">(Synes and Osborne 2011)</span>, and thus it should be made following informed and replicable procedures <span class="citation">(P. Mote et al. 2011, <span class="citation">Snover et al. (2013)</span>, <span class="citation">Vano et al. (2015)</span>)</span>.</p>
+<p>GCM compareR has been design to serve the purpose of informing about differences and similarities between GCMs and climate change scenarios, and of assisting the triage of models that best suit every used needs.</p>
+<hr />
+</div>
+<div id="use-of-the-app" class="section level4">
+<h4>Use of the App</h4>
+<p>GCM compareR contains tabs that might be used from left to right to define a comparison scenario, retrieve results and generate a report with them.</p>
+<ul>
+<li>The <em>Intro</em> tab includes all the information needed to use the app. Move the <em>Workflow</em> section to find full details about to use the app, and go to <em>About</em> to find information about who developed it.<br />
+</li>
+<li>In <em>Scenario</em> you will be able to make all choices: select the GCMs you would like to compare, pick a climate change scenario (year of projection, RCP…) and set the geographic extent of your analysis. Use the <em>Analyse</em> button on this tab to trigger the start of the analyses.<br />
+</li>
+<li>The tabs <em>Explore selected GCMs</em>, <em>Variation from present</em> and <em>Variation among futures</em> will display the results after the calculation is completed. Finally, <em>Report</em> will download a report with all the figures produced and some explanatory text.</li>
+</ul>
+<hr />
+</div>
+<div id="lastest-news" class="section level4">
+<h4>Lastest news</h4>
+<blockquote>
+<ul>
+<li>Release of GCM compareR (Sep 26, 2018)</li>
+</ul>
+</blockquote>
+<hr />
+</div>
 <div id="citation" class="section level4">
 <h4>Citation</h4>
-<p>How to cite this app: (will appear here)</p>
+<p>Please, if you use GCM compareR as part of your research, cite the app as:</p>
+<blockquote>
+<p>Fajardo, J, Corcoran, D., Roehrdanz, P, Hannah, P, Marquet, P (2018) GCM compareR: A web application to assess differences and assist in the selection of global circulation models for climate change research (in prep).</p>
+</blockquote>
+<hr />
 </div>
 <div id="contact-us" class="section level4">
 <h4>Contact us</h4>
 <p>Please, email <a href="mailto:derek.corcoran.barrios@gmail.com">derek.corcoran.barrios@gmail.com</a> with any question of create an issue on <a href="https://github.com/marquetlab/GCM_compareR" target="_blank">github</a>.</p>
+<hr />
 </div>
-<div id="references" class="section level4">
+<div id="references" class="section level4 unnumbered">
 <h4>References</h4>
+<div id="refs" class="references">
+<div id="ref-Barsugli2013">
+<p>Barsugli, Joseph J, Galina Guentchev, Radley M Horton, Andrew Wood, Linda O Omearns, Xin-Zhong Liang, Julie A Winkler, et al. 2013. “The practitioner’ s dilemma : How to assess the credibility of downscaled climate projections.” <em>Eos</em> 94 (46): 424–25.</p>
+</div>
+<div id="ref-Flato2013">
+<p>Flato, G., J. Marotzke, B. Abiodun, P. Braconnot, S.C. Chou, W. Collins, P. Cox, et al. 2013. “Evaluation of Climate Models.” In <em>Climate Change 2013: The Physical Science Basis. Contribution of Working Group I to the Fifth Assessment Report of the Intergovernmental Panel on Climate Change</em>, edited by T.F. Stocker, D. Qin, G.-K. Plattner, M. Tignor, S.K. Allen, J. Boschung, A. Nauels, Y. Xia, V. Bex, and P.M. Midgley. Cambridge, United Kingdom; New York, NY, USA: Cambridge University Press.</p>
+</div>
+<div id="ref-Knutti2008">
+<p>Knutti, Reto. 2008. “Should we believe model predictions of future climate change?” <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em> 366 (1885): 4647–64. doi:<a href="https://doi.org/10.1098/rsta.2008.0169">10.1098/rsta.2008.0169</a>.</p>
+</div>
+<div id="ref-Mote2011">
+<p>Mote, Philip, Levi Brekke, Philip B. Duffy, and Ed Maurer. 2011. “Guidelines for constructing climate scenarios.” <em>Eos</em> 92 (31): 257–64. doi:<a href="https://doi.org/10.1029/2011EO310001">10.1029/2011EO310001</a>.</p>
+</div>
+<div id="ref-Pierce2009">
+<p>Pierce, David W, Tim P Barnett, Benjamin D Santer, and Peter J Gleckler. 2009. “Selecting global climate models for regional climate change studies.” <em>Proceedings of the National Academy of Sciences</em> 106 (21): 8441–6. doi:<a href="https://doi.org/10.1073/pnas.0900094106">10.1073/pnas.0900094106</a>.</p>
+</div>
+<div id="ref-Snover2013">
+<p>Snover, Amy K., Nathan J. Mantua, Jeremy S. Littell, Michael A. Alexander, Michelle M. Mcclure, and Janet Nye. 2013. “Choosing and Using Climate-Change Scenarios for Ecological-Impact Assessments and Conservation Decisions.” <em>Conservation Biology</em> 27 (6): 1147–57. doi:<a href="https://doi.org/10.1111/cobi.12163">10.1111/cobi.12163</a>.</p>
+</div>
+<div id="ref-Synes2011">
+<p>Synes, Nicholas W., and Patrick E. Osborne. 2011. “Choice of predictor variables as a source of uncertainty in continental-scale species distribution modelling under climate change.” <em>Global Ecology and Biogeography</em> 20 (6): 904–14. doi:<a href="https://doi.org/10.1111/j.1466-8238.2010.00635.x">10.1111/j.1466-8238.2010.00635.x</a>.</p>
+</div>
+<div id="ref-Taylor2012a">
+<p>Taylor, Karl E., Ronald J. Stouffer, and Gerald A. Meehl. 2012. “An overview of CMIP5 and the experiment design.” <em>Bulletin of the American Meteorological Society</em> 93 (4): 485–98. doi:<a href="https://doi.org/10.1175/BAMS-D-11-00094.1">10.1175/BAMS-D-11-00094.1</a>.</p>
+</div>
+<div id="ref-Vano2015">
+<p>Vano, Julie A., John B. Kim, David E. Rupp, and Philip W. Mote. 2015. “Selecting climate change scenarios using impact-relevant sensitivities.” <em>Geophysical Research Letters</em> 42 (13): 5516–25.</p>
+</div>
 </div>
 </div>
 

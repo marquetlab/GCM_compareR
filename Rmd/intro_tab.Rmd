@@ -2,27 +2,50 @@
 title: "Intro tab"
 author: "Javier Fajardo"
 date: "21/5/2018"
-output: html_document
+output: html_fragment
+bibliography: biblio.bib
 ---
 
 #### Workflow
 
-This web App is designed to work in three steps. Each step can be found in a separate tab.
+GCM compareR web App is designed in tabs to separate the processes of defining a comparison scenario and retrieve the results. This tabs are generally used from left to right. The following is a description of the most common use of the app:
 
-**1**: *Definition of scenario*: 
+##### 1. Definition of scenario
 
-To start, select the GCMs that you want to compare, define a scenario of climate change, and select a study area. The options include:
+The tab **Scenario** is used to define the comparison to perform. The tab is composed by a side panel, where the options are selected, and a main panel including a map where the area of interest is delimited.
 
-- GCMs to compare
-- Climate change scenario: Select a future year, a RCP scenario, and a data resolution.
-- Select a type of comparison. Two posibilities are currently available: (a) compare one variable against another variable, and (b) compare two groups of variables. We advise comparing temperature against precipitation variables. If groups of variables are going to be compared, we additionally recommend including within a group variables that are modulated in a similar fashion (e.g. in all variables higher is more and smaller is less). This will make easier the interpretation of the results. Also, when only single variables are compared, results can be produced showing the real values of the variables. Otherwise, they are combined in order to combine variables whitin a group.
+To start, use the options in the side panel to define the comparsion of GCMs:  
 
-- Study area (...)
+**a. Global Circulation Models (GCMs).** Check the climatic models of interest and uncheck those that should not be included in the comparison. Use the tab *GCM details* above the map to toggle a table with details for any climate model. Not all models are available for all combination of scenarios (GCMs and year).  
+**b. Climate Change Scenario.** Select a future year and a Representative Concentration Pathway (RCP) to define the scenario. RCPs are standardized scenarios of future climate defined by varying emissions resulting from land use, population growth and technology [@Moss2010].  
 
-**2**: *Main figure and table*: 
+**c. Type of comparison.** Two posibilities are currently available: (a) compare one bioclimatic variable against another bioclimatic variable, and (b) compare two groups of bioclimatic variables. We recommend comparing temperature against precipitation variables (i.e. the default selection compares mean annual temperature agains annual precipitation). In the special case of comparing groups of variables, it is important to combine in the same group only variables that are modulated in a similar fashion (e.g. for all variables in the group higher is more and smaller is less). Notice that projections of these variables will be scaled and combined; not following this advice will make the interpretation of the results hard to interpret and likely confusing. When two single variables are compared, two types of results are produced: with the actual values of the variables and with scaled values. When groups of variables are compared, only the result of scaled values is presented, as this is a requirement for model combination.  
+d. Study area. Select one of the five options provided here and the interactive map to define your area of interest. Only pixels within the selected area will be compared.  
 
-**3**: *Maps*
+- Define a squarred area: this can be done through the first (*Select drawing a rectangle over the map*) and the last options (*Enter bounding-box coordinates*). The draw the rectangle over the map, click first the black square icon on the upper left corner of the map, and drag later a rectangle on the map. The other option will draw the rectangle automatically after you insert minimum and maximum longitude and latitude values (this option may be prefered for replicability).  
+- Define the study area by entering countries, biomes or ecoregions names. To use the option, select one of the other three options (*Select by country*, *Select by biome*, *Select by ecoregion*) and enter the name(s) of the item(s) in the box that will appear. More than one name may be selected. Once you enter one or more names, the map will refresh and display the selection in red (this might take a few seconds depending on your connection). This type of selections can be refined by using drawn rectangles. For instance, if you want to study the *Mediterranean forests, woodlands and shrubs* of Chile in South America, you can enclose this part of the biome in a rectangle right after the biome name has been selected and the map has turned red.  
 
-**4**: *Download a report*
+Once you are done with selecting the study area and options, press the **ANALYZE** green button below the map to proceed with the calculations. Once you have pressed the button, the following tabs will become selectable and you will see a progress bar informing the execution of the analyses. You may always come back to this tab to modify your defined scenario. 
+
+##### 2. Check the results
+
+The results are presented in next three tabs.
+
+**- Explore selected GCMs.** This tab displays the climatic models select with a common color scale that permits their comparison. Each selected bioclimatic variable is shown as a different group of maps. The first map in each group shows the "baseline" variable (current climatic conditions), and the second shows the average of the values for each pixel across all GCMs. 
+
+**- Variation from present.** This tab includes the results of comparing all models with the current climate. It is useful to learn about the spread of GCMs in the context of their differences with the current conditions for a particular escenario in the area selected. The spread of mean differences can be found under the subtab *Spread of GCMs*, and maps showing the spatial pattern of these differences are in the subtab *Maps of differences*. The scatterplot and table can be shown displaying the projected values for the variables (e.g. total annual precipitation projection for each model) or their difference in respect to current climate (e.g. projected increase or decrease in annual precipitation).
+
+**- Variation among futures.** This tab includes the results of comparing all models against the average (or ensemble) projection in the future scenario. It is useful to learn about the spread of GCMs with focus on how different are they from the average projected values for a particular escenario in the area selected. The spread of mean differences can be found under the subtab *Spread of GCMs*, and maps showing the spatial pattern of these differences are in the subtab *Maps of differences*. This comparison may be done using unscaled variable values or scaled (the only option when the comparison involves more than a couple of variables).
+
+All three tabs include visualization options to add the borders of countries, biomes or ecoregions to the maps. These maps can be downloaded by right clicking on the image and selecting the option to save. Scatterplots and tables can also be downloaded by using each particular download buttons (tables are not part of the reports, so do not forget downloading them from here if you want to use them later).
+
+##### 3. Download a report with all results
+
+This last tab downloads a report including all produced and visualized results (except for tables, that might be download separatedly in .csv format. Beware that the results that are not visualized will not be included in the report (Shiny apps work by making analyses only when their visualization is required).  
+
 
 You will find further assistance within each tab.
+
+
+#### References
+
