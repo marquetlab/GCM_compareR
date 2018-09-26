@@ -37,7 +37,7 @@ ui <- tagList(
     id = "navbar",
     title = "GCM compareR",
     position = "fixed-top",
-    selected = "scenario",
+    selected = "intro",  #"scenario"
     
     # Main page tabs
     tags$style(type="text/css", 
@@ -95,8 +95,10 @@ ui <- tagList(
                  div(img(src = "sparc.svg", width = 250), style = "text-align: center;"),
                  hr(),
                  h5("With the support of:"),
-                 div(img(src = "gef.png", width = 100, style = "text-align: center;"), 
-                     img(src = "ieb.png", width = 160), style = "text-align: center;")
+                 div(img(src = "PUC.png", width = 100, style = "text-align: center;"),
+                     img(src = "ieb.png", width = 160, style = "text-align: center;"),
+                     img(src = "gef.png", width = 100, style = "text-align: center;")),
+                 div(img(src = "CI_logo.png", width = 300, style = "text-align: center;"))
                )
              ),
              
@@ -121,7 +123,13 @@ ui <- tagList(
                            tabPanel("About",
                                     column(12,
                                            hr(),
-                                           includeHTML("Rmd/intro_about.html")))
+                                           includeHTML("Rmd/intro_about.html"))),
+                           
+                           tabPanel("Changelog",
+                                    value = "changelog",
+                                    column(12,
+                                           hr(),
+                                           includeMarkdown("Rmd/Changelog.Rmd")))
                )
              )
     ),
@@ -212,7 +220,7 @@ ui <- tagList(
                                 # Drawing a extent
                                 radioButtons(inputId = "extent_type", 
                                              label = NULL,
-                                             choices = c("Select drawing a rectangle over the map (press square icon)" = "map_draw",
+                                             choices = c("Select drawing a rectangle over the map" = "map_draw",
                                                          "Select by country/countries" = "map_country",
                                                          "Select by biome(s)" = "map_biomes",
                                                          "Select by ecorregion(s)" = "map_ecorregions",
@@ -292,24 +300,49 @@ ui <- tagList(
                                     hr(),
                                     
                                     ## Button ANALYZE
+                                    # fluidRow(
+                                    #   column(4),
+                                    #   column(3, h6("Press here when ready:")),
+                                    #   column(1, shiny::actionButton(inputId = "go",
+                                    #                                 label = "ANALYZE",
+                                    #                                 icon = icon("bolt"),
+                                    #                                 style="color: #fff; background-color: #57be91; 
+                                    #                                 border-color: #2e6da4; font-size:160%; padding:10px")))
+                                    #   ),
                                     fluidRow(
-                                      column(4),
-                                      column(3, h6("Press here when ready:")),
-                                      column(1, shiny::actionButton(inputId = "go",
-                                                                    label = "ANALYZE",
-                                                                    icon = icon("bolt"),
-                                                                    style="color: #fff; background-color: #57be91; 
-                                                                    border-color: #2e6da4; font-size:160%; padding:10px")))
-                                      ),
+                                      column(2, h6("Press when ready:")),
+                                      column(3, #h6(tags$b("Press when ready:")), 
+                                             shiny::actionButton(inputId = "go",
+                                                                 label = "ANALYZE",
+                                                                 icon = icon("bolt"),
+                                                                 style="color: #fff; background-color: #57be91; 
+                                                                    border-color: #2e6da4; font-size:160%; padding:10px")),
+                                      column(6, 
+                                             tags$b(HTML("Instructions for marking the map:")),
+                                             tags$div(HTML("- Click on the square icon to drag a selection.")),
+                                             tags$div(HTML("- To analyze only a section of the countries/biomes/ecoregions selected, draw a selection over them.")),
+                                             # tags$div(HTML("- Use the edit and delete icons to modify a selection.")),
+                                             # h6(tags$span(style="color:red", "- Be careful when using rectangle selections and country/biome/ecoregion: if there is no overlap, the app will crash."))
+                                             tags$div(HTML(paste0("- Be careful when using ", tags$span(style="color:red", "rectangle selections"), " and ", tags$span(style="color:red", "country/biome/ecoregion:"), tags$span(style="color:red", "   if there is no overlap, the app will crash."), " Make a new selection by draging again if necessary.")))
+                                      ))
+                                    
+                           ),
                            
                            # tabPanel("Explore individual layers",
                            #          value = "scenario_individual",
                            #          leaflet::leafletOutput("map_ind", height = 600)),
                            
-                           tabPanel("Instructions", 
+                           # tabPanel("Instructions", 
+                           #          value = "scenario_instructions",
+                           #          column(8,
+                           #                 includeMarkdown("Rmd/map_instructions.Rmd")))
+                           
+                           tabPanel("GCM details", 
                                     value = "scenario_instructions",
-                                    column(8,
-                                           includeMarkdown("Rmd/map_instructions.Rmd")))
+                                    column(12,
+                                           h6("This table include the details for all GCMs available in GCM compareR. Notice that not all GCM are available for all scenarios"),
+                                           hr(),
+                                           tableOutput("GCMs_table")))
                )
              )
     ),
@@ -355,7 +388,7 @@ ui <- tagList(
                            ))),
     
     ### Compare with Present Climate
-    tabPanel(title = "CHANGE FROM PRESENT",
+    tabPanel(title = "VARIATION FROM PRESENT",
              value = "current",
              
              sidebarLayout(position = "left",
@@ -369,7 +402,7 @@ ui <- tagList(
                                     textOutput("selected_comparison_pre_tab"),
                                     hr(),
                                     
-                                    h4("Change from present"),
+                                    h4("Variation from present"),
                                     p("These results focus on differences between GCMs projections and the baseline (current climate). 
                                       They can be used to identify which GCMs forecast larger or smaller changes in climate
                                       (e.g. units of increase in mean annual temperature) and to diagnose in which direction 
@@ -476,7 +509,7 @@ ui <- tagList(
     
     
     ### MAPS (I): Explore GCMS
-    tabPanel(title = "CHANGE BETWEEN FUTURES",
+    tabPanel(title = "VARIATION AMONG FUTURES",
              value = "future",
              
              sidebarLayout(position = "left",
@@ -489,7 +522,7 @@ ui <- tagList(
                                     textOutput("selected_comparison_fut_tab"),
                                     hr(),
                                     
-                                    h4("Change between futures"),
+                                    h4("Variation among futures"),
                                     p("Results displayed here focus on differences within the universe of selected GCMs. 
                                       As a first step, a mean ensemble climate projection is calculated by averaging the
                                       value in each downscaled GCM on a pixel basis. Then, the value in each model is 

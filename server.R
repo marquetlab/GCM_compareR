@@ -38,6 +38,10 @@ ecorregions <- read_sf("data/Ecoregions2017.shp")
 ecorregions_sp <- readOGR("data", "Ecoregions2017")
 
 
+# Available GCMs
+table_GCMs <- read_csv("data/GCMs_details.csv") %>% 
+  dplyr::select(-"Actual name")
+
 ##############################################################################################################################################################################
 ########################################    SERVER   ######################################################################################################################
 ##############################################################################################################################################################################
@@ -93,13 +97,35 @@ server <- function(input, output) {
   # Disable results tab until input$go is used
   observeEvent(input$go == 1,{
     
-    if(input$go == 1){#If true enable, else disable
-      js$enabletab("abc")
-    }else{
+    if(input$go == 0){    #If true enable, else disable
       js$disabletab("abc")
+    }else{
+      js$enabletab("abc")
     }
     
   })
+  
+  ### Remove old saved results if GO! is pressed again, so these results are not included in 
+  ### the report
+  observeEvent(input$go, {
+    rvs$saved_bbox <- NULL
+    rvs$plot_comp_download_unscaled <- NULL
+    rvs$plot_comp_download_deltas <- NULL
+    rvs$plot_comp_download_scaled <- NULL
+    rvs$plot_temp_prec_realunscaled <- NULL
+    rvs$plot_gcm_pattern <- NULL
+    rvs$plot_delta_pattern <- NULL
+    rvs$plot_gcm_differences <- NULL
+  })
+  
+  
+  
+  # Table of Available GCMs and data
+  output$GCMs_table <- function(){
+    table_GCMs %>%
+      knitr::kable("html") %>%
+      kable_styling("striped", full_width = F)
+  }
   
   
   ##################################################
@@ -349,7 +375,9 @@ server <- function(input, output) {
                    rectangleOptions = filterNULL(list(
                      shapeOptions = drawShapeOptions(fillColor = "#8e113f",
                                                      color = "#595959"))),
-                   polylineOptions = FALSE, polygonOptions = FALSE, circleOptions = FALSE, circleMarkerOptions = FALSE, markerOptions = FALSE)
+                   polylineOptions = FALSE, polygonOptions = FALSE, circleOptions = FALSE, 
+                   circleMarkerOptions = FALSE, markerOptions = FALSE)#,
+                   # editOptions = editToolbarOptions())
   
   output$map <- renderLeaflet(m)
   # create map proxy to make further changes to existing map
@@ -361,9 +389,13 @@ server <- function(input, output) {
     if (input$extent_type == "map_draw") {
       map %>% 
         hideGroup("country") %>% 
+        hideGroup("countrySel") %>% 
         hideGroup("biomes") %>% 
+        hideGroup("biomesSel") %>% 
         hideGroup("ecorregions") %>% 
+        hideGroup("ecorregionsSel") %>% 
         hideGroup("bbox") %>% 
+        clearGroup("draw") %>%
         showGroup("draw") 
       
       req(input$map_draw_new_feature)
@@ -382,14 +414,19 @@ server <- function(input, output) {
       req(input$xmin, input$xmax, input$ymin, input$ymax) # This stops it from failing while the number is being typed
       
       map %>% 
-        hideGroup("country") %>% 
-        hideGroup("draw") %>% 
-        hideGroup("biomes") %>%
-        hideGroup("ecorregions") %>%
         clearGroup("bbox") %>% 
-        clearGroup("draw") %>% 
+        clearGroup("draw") %>%
+        clearGroup("biomes") %>% 
         clearGroup("biomesSel") %>% 
+        clearGroup("ecorregions") %>% 
         clearGroup("ecorregionsSel") %>% 
+        hideGroup("country") %>% 
+        hideGroup("countrySel") %>% 
+        # hideGroup("draw") %>% 
+        hideGroup("biomes") %>%
+        hideGroup("biomesSel") %>%
+        hideGroup("ecorregions") %>%
+        hideGroup("ecorregionsSel") %>%
         showGroup("bbox") %>% 
         addRectangles(group = "bbox",
                       lng1 = input$xmin, 
@@ -417,16 +454,21 @@ server <- function(input, output) {
       
       # Add polygons to leaflet
       map %>% 
-        hideGroup("biomes") %>% 
-        hideGroup("bbox") %>% 
-        hideGroup("ecorregions") %>% 
-        clearGroup("draw") %>% 
+        clearGroup("draw") %>%
         clearGroup("bbox") %>% 
+        clearGroup("biomes") %>% 
         clearGroup("biomesSel") %>% 
+        clearGroup("ecorregions") %>% 
         clearGroup("ecorregionsSel") %>% 
-        showGroup("country") %>% 
-        # clearGroup("countrySel") %>% 
+        clearGroup("countrySel") %>% 
+        hideGroup("biomes") %>% 
+        hideGroup("biomesSel") %>% 
+        hideGroup("bbox") %>% 
+        # hideGroup("draw") %>%
+        hideGroup("ecorregions") %>% 
+        hideGroup("ecorregionsSel") %>% 
         showGroup("countrySel") %>% 
+        showGroup("country") %>% 
         addPolygons(data = world_sf, 
                     group = "country",
                     weight = 1,
@@ -468,12 +510,16 @@ server <- function(input, output) {
       map %>% 
         hideGroup("country") %>% 
         hideGroup("bbox") %>% 
+        # hideGroup("draw") %>% 
         hideGroup("ecorregions") %>% 
-        clearGroup("draw") %>% 
+        clearGroup("draw") %>%
+        clearGroup("country") %>% 
         clearGroup("countrySel") %>% 
+        clearGroup("ecorregions") %>% 
         clearGroup("ecorregionsSel") %>% 
-        showGroup("biomes") %>% 
+        clearGroup("biomesSel") %>% 
         showGroup("biomesSel") %>% 
+        showGroup("biomes") %>% 
         addPolygons(data = biomes,
                     group = "biomes",
                     weight = 1,

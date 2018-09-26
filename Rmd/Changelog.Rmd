@@ -1,0 +1,22 @@
+---
+title: "Changelog"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+### Released versions
+
+#### Version 0.9.1 (Aug 21, 2018)
+- Update in tab names.
+
+#### Version 0.9 (Aug 21, 2018)
+- Corrected an error where result tabs were disabled after a second use of the ANALYZE! button.
+- Corrected an error that caused the report to include figures from old executions.
+- Short instruccion for rectangle selection added below the map in the study area tab.
+- Warnings added about overlap between rectangle selection and countries/biomes/ecoregions.
+- Tab added with information for GCMs (developing institutions, full name, website...).
+- Intro is selected as default tab when starting.
+
+#### Version 0.8 (before Aug 21, 2018)
+(This was the first version online shared between authors when sharing the manuscript draft)

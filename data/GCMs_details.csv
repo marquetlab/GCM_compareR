@@ -1,0 +1,35 @@
+GCM,Actual name,Group acronym,Modelling group,Country,web
+bcc_csm1_1_m,bcc-csm1-1-m,BCC,"Beijing Climate Center, China Meteorological Administration",China,http://bcc.ncc-cma.net/
+bcc_csm1_1,bcc-csm1-1,BCC,"Beijing Climate Center, China Meteorological Administration",China,http://bcc.ncc-cma.net/
+bnu_esm,BNU-ESM,GCESS,"College of Global Change and Earth System Science, Beijing Normal University",China,http://www.gcess.cn/
+cccma_canesm2,CanESM2,CCCMA,Canadian Centre for Climate Modelling and Analysis,Canada,https://www.canada.ca/en/environment-climate-change/services/climate-change/centre-modelling-analysis.html
+cesm1_bgc,CESM1-WACCM????,NSF-DOE-NCAR,Community Earth System Model Contributors,United States of America,http://www.cesm.ucar.edu/
+cesm1_cam5,CESM1-CAM5,NSF-DOE-NCAR,Community Earth System Model Contributors,United States of America,http://www.cesm.ucar.edu/
+csiro_access1_0,ACCESS1-0,CSIRO-BOM,"Commonwealth Scientific and Industrial Research Organization (CSIRO) and Bureau of Meteorology (BOM), Australia",Australia,https://www.csiro.au/
+csiro_access1_3,ACCESS1-3,CSIRO-BOM,"Commonwealth Scientific and Industrial Research Organization (CSIRO) and Bureau of Meteorology (BOM), Australia",Australia,https://www.csiro.au/
+csiro_mk3_6_0,CSIRO-Mk3-6-0,CSIRO-QCCCE,Commonwealth Scientific and Industrial Research Organization in collaboration with Queensland Climate Change Centre of Excellence,Australia,https://www.csiro.au/
+ec_earth,EC-EARTH,ICHEM,EC-EARTH consortium,Europe-wide consortium,http://www.ec-earth.org/
+fio_esm,FIO-ESM,FIO,"The First Institute of Oceanography, SOA, China",China,http://www.fio.org.cn/en/
+gfdl_cm3,GFDL-CM3,NOAA GFDL,NOAA Geophysical Fluid Dynamics Laboratory,United States of America,https://www.gfdl.noaa.gov/
+gfdl_esm2g,GFDL-ESM2G,NOAA GFDL,NOAA Geophysical Fluid Dynamics Laboratory,United States of America,https://www.gfdl.noaa.gov/
+gfdl_esm2m,GFDL-ESM2M,NOAA GFDL,NOAA Geophysical Fluid Dynamics Laboratory,United States of America,https://www.gfdl.noaa.gov/
+giss_e2_h_cc,GISS-E2-H-CC,NASA-GISS,NASA Goddard Institute for Space Studies,United States of America,https://www.giss.nasa.gov/
+giss_e2_h,GISS-E2-H,NASA-GISS,NASA Goddard Institute for Space Studies,United States of America,https://www.giss.nasa.gov/
+giss_e2_r_cc,GISS-E2-R-CC,NASA-GISS,NASA Goddard Institute for Space Studies,United States of America,https://www.giss.nasa.gov/
+giss_e2_r,GISS-E2-R,NASA-GISS,NASA Goddard Institute for Space Studies,United States of America,https://www.giss.nasa.gov/
+inm_cm4,inmcm4,INM,Institute for Numerical Mathematics,Russia,http://www.inm.ras.ru/inm_en_ver/
+ipsl_cm5a_lr,IPSL-CM5A-LR,IPSL,Institut Pierre-Simon Laplace,France,https://www.ipsl.fr/
+ipsl_cm5a_mr,IPSL-CM5A-MR,IPSL,Institut Pierre-Simon Laplace,France,https://www.ipsl.fr/
+ipsl_cm5b_lr,IPSL-CM5B-LR,IPSL,Institut Pierre-Simon Laplace,France,https://www.ipsl.fr/
+lasg_fgoals_g2,FGOALS-g2,LASG-CESS,"LASG, Institute of Atmospheric Physics, Chinese Academy of Sciences and CESS,Tsinghua University",China,http://www.lasg.ac.cn/english/
+miroc_esm_chem,MIROC-ESM-CHEM,MIROC,"Japan Agency for Marine-Earth Science and Technology, Atmosphere and Ocean Research Institute (The University of Tokyo), and National Institute for Environmental Studies",Japan,http://www.jamstec.go.jp/e/
+miroc_esm,MIROC-ESM,MIROC,"Japan Agency for Marine-Earth Science and Technology, Atmosphere and Ocean Research Institute (The University of Tokyo), and National Institute for Environmental Studies",Japan,http://www.jamstec.go.jp/e/
+miroc_miroc5,MIROC5,MIROC,"Japan Agency for Marine-Earth Science and Technology, Atmosphere and Ocean Research Institute (The University of Tokyo), and National Institute for Environmental Studies",Japan,http://www.jamstec.go.jp/e/
+mohc_hadgem2_cc,HadGEM2-CC,MOHC,Met Office Hadley Centre,United Kingdom,https://www.metoffice.gov.uk/climate-guide/science/science-behind-climate-change/hadley
+mohc_hadgem2_es,HadGEM2-ES,MOHC,Met Office Hadley Centre,United Kingdom,https://www.metoffice.gov.uk/climate-guide/science/science-behind-climate-change/hadley
+mpi_esm_lr,MPI-ESM-LR,MPI-M,Max Planck Institute for Meteorology,Germany,https://www.mpimet.mpg.de/startseite/
+mpi_esm_mr,MPI-ESM-MR,MPI-M,Max Planck Institute for Meteorology,Germany,https://www.mpimet.mpg.de/startseite/
+mri_cgcm3,MRI-CGCM3,MRI,Meteorological Research Institute,Japan,http://www.mri-jma.go.jp/index_en.html
+ncar_ccsm4,CCSM4,NCAR,National Center for Atmospheric Research,United States of America,https://ncar.ucar.edu/
+ncc_noresm1_m,Nor-ESM1-M,NCC,Norwegian Climate Centre,Norway,https://folk.uib.no/ngfhd/EarthClim/index.htm
+nimr_hadgem2_ao,HadGEM2-A0,NIMR/KMA,National Institute of Meteorological Research/Korea Meteorological Administration,South Korea,http://www.nimr.go.kr/AE/?sub_num=127
