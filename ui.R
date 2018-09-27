@@ -12,7 +12,7 @@ library(leaflet.extras)
 ########################################      UI       ######################################################################################################################
 ##############################################################################################################################################################################
 
-##JS Code for enabling and diabling
+##JS Code for enabling and diabling result tabs
 jscode <- "shinyjs.disabletab =function(name){
 $('ul li:has(a[data-value= \"selected\"])').addClass('disabled');
 $('ul li:has(a[data-value= \"current\"])').addClass('disabled');
@@ -39,6 +39,7 @@ ui <- tagList(
     position = "fixed-top",
     selected = "intro",  #"scenario"
     
+    ### USER INTERFACE VISUAL OPTIONS
     # Main page tabs
     tags$style(type="text/css", 
                'body {padding-top: 85px;}',
@@ -46,7 +47,6 @@ ui <- tagList(
                font-family: Arial;
                font-size: 16px;
                color: #f5f5f5; }'#,
-               # '.navbar-default .navbar-brand {color: #f5f5f5;}'
     ),
     
     # css styles
@@ -79,13 +79,12 @@ ui <- tagList(
     
     tags$head(
       tags$style(HTML('#intro{background-color: rgba(27, 158, 119, 0.5);
-                                 border-color: rgb(27, 158, 119)}'))
-    ),
+                      border-color: rgb(27, 158, 119)}'))
+      ),
     
-    ### Intro ###
+    #### Intro tab
     tabPanel(title = "INTRO",
              value = "intro",
-             # icon = icon("book"),
              
              sidebarPanel(
                wellPanel(
@@ -108,36 +107,26 @@ ui <- tagList(
                                     column(12,
                                            hr(),
                                            includeHTML("Rmd/intro_main.html"))),
-                                    # column(12, 
-                                    #        hr(),
-                                    #        h4("GCM compareR"),
-                                    #        p(HTML("<span id = 'bold'>GCM compareR</span>"),
-                                    #          "is a web application that assists the selection of Global Circulation Models (GCMs) for climate change research."))
-                                    #        ),
-                           
                            tabPanel("Workflow",
                                     column(12,
                                            hr(),
-                                           includeMarkdown("Rmd/intro_tab.Rmd"))),
-                           
+                                           includeHTML("Rmd/intro_tab.html"))),
                            tabPanel("About",
                                     column(12,
                                            hr(),
                                            includeHTML("Rmd/intro_about.html"))),
-                           
                            tabPanel("Changelog",
                                     value = "changelog",
                                     column(12,
                                            hr(),
                                            includeMarkdown("Rmd/Changelog.Rmd")))
+                           )
                )
-             )
     ),
     
     ### Scenario definition ###
     tabPanel(title = "SCENARIO",
              value = "scenario",
-             # icon = icon("globe"),
              
              sidebarPanel(
                h4("SELECT A SCENARIO"),
@@ -182,7 +171,7 @@ ui <- tagList(
                                                     selected = "rcp45")),
                                 
                                 # Resolution of climatic data
-                                hidden(radioButtons(inputId = "res_sel", 
+                                hidden(radioButtons(inputId = "res_sel",
                                                     label = "Climatic data resolution",
                                                     inline = TRUE,
                                                     choices = c("10 arc-min" = "10m",
@@ -208,7 +197,9 @@ ui <- tagList(
                                                  hidden(uiOutput("compare_type_bio_bio"))),
                                 
                                 conditionalPanel(condition = "input.compare_type == 'bio_several'",
-                                                 hidden(uiOutput("compare_type_bio_several"))),
+                                                 hidden(uiOutput("compare_type_bio_several")),
+                                                 p(tags$span(style="color:#B64249", "Note: Only some scatter plot results are available with this option 
+                                                             (the differences of scaled values, in 'Variation among futures'). All maps will still be produced."))),
                                 
                                 textOutput("selected_comparison"),
                                 hr(),
@@ -259,7 +250,10 @@ ui <- tagList(
                                                  div(style = "display:inline-block",
                                                      numericInput("ymin", "ymax", -60, min = -60, max = 90, step = 0.5)),
                                                  div(style = "display:inline-block",
-                                                     numericInput("ymax", "ymax", 90, min = -90, max = 90, step = 0.5)))#,
+                                                     numericInput("ymax", "ymax", 90, min = -90, max = 90, step = 0.5)),
+                                                 p(tags$span(style="color:#B64249", "Warning: invalid ranges may cause the app to crash. Do not enter
+                                                             xmax or ymax smaller than xmin and ymin (and viceversa). Latitude valid values range from -90 to 60,
+                                                             and longitude from -180 to 180.")))#,
                ),
                
                conditionalPanel("input.map_panel == 'scenario_individual'",
@@ -286,69 +280,54 @@ ui <- tagList(
                                 uiOutput("map_individual"))
              ),
              
-             ## Map
+             #### Main Panel
              mainPanel(
                
                tabsetPanel(id = "map_panel",
-                           # type = "pills",
                            type = "tabs",
                            
+                           # MAP
                            tabPanel("Map", 
                                     value = "scenario_map",
                                     
                                     leaflet::leafletOutput("map", height = 600),
                                     hr(),
                                     
-                                    ## Button ANALYZE
-                                    # fluidRow(
-                                    #   column(4),
-                                    #   column(3, h6("Press here when ready:")),
-                                    #   column(1, shiny::actionButton(inputId = "go",
-                                    #                                 label = "ANALYZE",
-                                    #                                 icon = icon("bolt"),
-                                    #                                 style="color: #fff; background-color: #57be91; 
-                                    #                                 border-color: #2e6da4; font-size:160%; padding:10px")))
-                                    #   ),
                                     fluidRow(
-                                      column(2, h6("Press when ready:")),
+                                      column(2, 
+                                             h6("Press button when ready"), 
+                                             h6("Press again after changes")),
                                       column(3, #h6(tags$b("Press when ready:")), 
                                              shiny::actionButton(inputId = "go",
-                                                                 label = "ANALYZE",
+                                                                 label = " COMPARE  ",
                                                                  icon = icon("bolt"),
                                                                  style="color: #fff; background-color: #57be91; 
-                                                                    border-color: #2e6da4; font-size:160%; padding:10px")),
+                                                                 border-color: #2e6da4; font-size:160%; padding:10px")),
                                       column(6, 
-                                             tags$b(HTML("Instructions for marking the map:")),
+                                             tags$b(HTML("Instructions for selecting on the map:")),
                                              tags$div(HTML("- Click on the square icon to drag a selection.")),
-                                             tags$div(HTML("- To analyze only a section of the countries/biomes/ecoregions selected, draw a selection over them.")),
-                                             # tags$div(HTML("- Use the edit and delete icons to modify a selection.")),
-                                             # h6(tags$span(style="color:red", "- Be careful when using rectangle selections and country/biome/ecoregion: if there is no overlap, the app will crash."))
-                                             tags$div(HTML(paste0("- Be careful when using ", tags$span(style="color:red", "rectangle selections"), " and ", tags$span(style="color:red", "country/biome/ecoregion:"), tags$span(style="color:red", "   if there is no overlap, the app will crash."), " Make a new selection by draging again if necessary.")))
-                                      ))
-                                    
-                           ),
+                                             tags$div(HTML("- To analyze only a section of the countries/biomes/ecoregions selected, draw a selection over them after entering their names on the left panel.")),
+                                             tags$div(HTML(paste0("- Be careful when using ", tags$span(style="color:#B64249", "rectangle selections"), " and ", 
+                                                                  tags$span(style="color:#B64249", "country/biome/ecoregion:"), 
+                                                                  tags$span(style="color:#B64249", "   if there is no overlap, the app will crash. The same will happen if your rectangle does not cover any land."), 
+                                                                  " Make a new selection by draging again if necessary.")))
+                                             )
+                                      )
+                                    ),
                            
-                           # tabPanel("Explore individual layers",
-                           #          value = "scenario_individual",
-                           #          leaflet::leafletOutput("map_ind", height = 600)),
-                           
-                           # tabPanel("Instructions", 
-                           #          value = "scenario_instructions",
-                           #          column(8,
-                           #                 includeMarkdown("Rmd/map_instructions.Rmd")))
-                           
-                           tabPanel("GCM details", 
+                           # GCM table
+                           tabPanel("Summary table of GCMs", 
                                     value = "scenario_instructions",
                                     column(12,
                                            h6("This table include the details for all GCMs available in GCM compareR. Notice that not all GCM are available for all scenarios"),
                                            hr(),
                                            tableOutput("GCMs_table")))
+                           )
                )
-             )
     ),
     
     ### Selected scenario
-    tabPanel(title = "SELECTED GCMs",
+    tabPanel(title = "EXPLORE SELECTED GCMs",
              value = "selected",
              
              sidebarLayout(position = "left",
@@ -357,35 +336,38 @@ ui <- tagList(
                            sidebarPanel(
                              
                              wellPanel(#12, 
-                                    h5("SELECTED OPTIONS:"),
-                                    textOutput("selected_gcms_2_tab"),
-                                    textOutput("selected_scenario_2_tab"),
-                                    textOutput("selected_comparison_2_tab"),
-                                    hr(),
-                                    
-                                    # Description of the tab
-                                    h4("Selected GCMs"),
-                                    p("These maps show all selected GCMs for a climate change scenario with 
-                                      a common variable and color scale. The first two maps for each 
-                                      bioclimatic layer are the baseline scenario (current climatic conditions)
-                                      and the ensemble of the mean values among all GCMs."),
-                                    
-                                    # Visualization options
-                                    h5("Visualization options"),
-                                    radioButtons("add_layer", "Overlay on maps:",
-                                                 c("Do not overlay anything" = "nothing",
-                                                   "Country borders" = "countries",
-                                                   "Biomes" = "biomes",
-                                                   "Ecoregions" = "ecoregions"),
-                                                 selected = "nothing")
-                                    )
-                           ),
+                               h5("SELECTED OPTIONS:"),
+                               textOutput("selected_gcms_2_tab"),
+                               textOutput("selected_scenario_2_tab"),
+                               textOutput("selected_comparison_2_tab"),
+                               hr(),
+                               
+                               # Description of the tab
+                               h4("Selected GCMs"),
+                               p("These maps show all selected GCMs for a climate change scenario with 
+                                 a common variable and color scale. The first two maps for each 
+                                 bioclimatic layer are the baseline scenario (current climatic conditions)
+                                 and the ensemble of the mean values among all GCMs."),
+                               
+                               # Visualization options
+                               h5("Visualization options"),
+                               radioButtons("add_layer", "Overlay on maps:",
+                                            c("Do not overlay anything" = "nothing",
+                                              "Country borders" = "countries",
+                                              "Biomes" = "biomes",
+                                              "Ecoregions" = "ecoregions"),
+                                            selected = "nothing")
+                               )
+                             ),
                            
                            mainPanel(
-                             textOutput("no_analyze"),
-                             uiOutput("gcm_patterns")
                              
-                           ))),
+                             hr(),
+                             textOutput("no_analyze_fig_gcms"),
+                             hr(),
+                             
+                             uiOutput("gcm_patterns")
+                             ))),
     
     ### Compare with Present Climate
     tabPanel(title = "VARIATION FROM PRESENT",
@@ -395,74 +377,65 @@ ui <- tagList(
                            fluid = TRUE,
                            
                            sidebarPanel(
+                             style = "position:fixed;width:inherit;",
                              wellPanel(#12,
-                                    h5("SELECTED OPTIONS:"),
-                                    textOutput("selected_gcms_pre_tab"),
-                                    textOutput("selected_scenario_pre_tab"),
-                                    textOutput("selected_comparison_pre_tab"),
-                                    hr(),
-                                    
-                                    h4("Variation from present"),
-                                    p("These results focus on differences between GCMs projections and the baseline (current climate). 
-                                      They can be used to identify which GCMs forecast larger or smaller changes in climate
-                                      (e.g. units of increase in mean annual temperature) and to diagnose in which direction 
-                                      are produced those changes (e.g. some models might project an average reduction in annual
-                                      precipitation and others an increase)"),
-                                    hr(),
-                                    
-                                    
-                                    conditionalPanel("input.maps_present == 'fig_pre_delta'",
-                                                     h5("Scatterplot"),
-                                                     p("the averaged projected value for two selected bioclimatic variables is plotted 
-                                                       for each GCM, the ensemble and the baseline, similarly to the method described 
-                                                       in Vano et al. (2015). Axis values can be displayed as unmodified projected 
-                                                       values or as deltas (i.e. difference between GCMs and baseline average values)"),
-                                                     radioButtons(inputId = "type_scaled_pre_delta",
-                                                                  label = "Type of plotted data",
-                                                                  choices = c(#"Scaled differences to ensemble" = "scaled", 
-                                                                    "Average of bioclimatic variables (ºC, mm)" = "no_scaled",
-                                                                    "Deltas (GCM - baseline; dºC, dmm)" = "deltas"),
-                                                                  selected = "no_scaled"),
-                                                     hr(),
-                                                     
-                                                     downloadButton('download_prec_temp_unscaled', 'Download fig'),
-                                                     downloadButton('download_prec_temp_deltas', 'Download fig deltas'),
-                                                     hr(),
-                                                     downloadButton('download_comparison_table_no_scaled', 'Download table')
-                                    ),
-                                    
-                                    conditionalPanel("input.maps_present == 'maps_pre_delta'",
-                                                     h5("Maps"),
-                                                     p("These maps show the spatial pattern of changes projected by GCMs from 
-                                                       current climate (BASELINE). The average ensemble projection across GCMs
-                                                       is also included (ENSEMBLE)"),
-                                                     h5("Visualization options"),
-                                                     radioButtons("add_layer2", "Overlay on maps:",
-                                                                  c("Do not overlay anything" = "nothing",
-                                                                    "Country borders" = "countries",
-                                                                    "Biomes" = "biomes",
-                                                                    "Ecoregions" = "ecoregions"),
-                                                                  selected = "nothing")#,
-                                                     
-                                                     # includeMarkdown("Rmd/tab2_delta_gcm.Rmd")
-                                                     )#,
-                                    
-                                    # conditionalPanel("input.maps_present == 'leaflet_pre_delta'",
-                                    #                  uiOutput("map_pre_delta_bio"),
-                                    #                  uiOutput("map_pre_delta_gcm"),
-                                    #                  
-                                    #                  h6("Download layer"),
-                                    #                  selectInput(inputId = "download_pre_delta_format",
-                                    #                              label = "Raster file format",
-                                    #                              choices = c("rds", "tif"),
-                                    #                              selected = "tif",
-                                    #                              width = "400"),
-                                    #                  downloadButton('allow_download_layer_pre_delta', 'Download visible raster layer'))
-                                    
-                             )
-                           ),
+                               h5("SELECTED OPTIONS:"),
+                               textOutput("selected_gcms_pre_tab"),
+                               textOutput("selected_scenario_pre_tab"),
+                               textOutput("selected_comparison_pre_tab"),
+                               hr(),
+                               
+                               h4("Variation from present"),
+                               p("These results focus on differences between GCMs projections and the baseline (current climate). 
+                                 They can be used to identify which GCMs forecast larger or smaller changes in climate
+                                 (e.g. units of increase in mean annual temperature) and to diagnose in which direction 
+                                 are produced those changes (e.g. some models might project an average reduction in annual
+                                 precipitation and others an increase)"),
+                               hr(),
+                               
+                               conditionalPanel("input.maps_present == 'fig_pre_delta'",
+                                                h5("Scatterplot"),
+                                                p("To display the spread between GCMs, the averaged projected value for
+                                                  two selected bioclimatic variables is plotted 
+                                                  for each GCM together with the average projection ensemble and the baseline. 
+                                                  Axis values can indicate the projected values or the difference 
+                                                  with current climatic condition values"),
+                                                radioButtons(inputId = "type_scaled_pre_delta",
+                                                             label = "Type of plotted data",
+                                                             choices = c(#"Scaled differences to ensemble" = "scaled", 
+                                                               "Projected values (ºC, mm)" = "no_scaled",
+                                                               "Difference with current values (GCM - baseline; ºC, mm)" = "deltas"),
+                                                             selected = "no_scaled"),
+                                                
+                                                hr(),
+                                                conditionalPanel("input.type_scaled_pre_delta == 'deltas'")
+                                                
+                                                ),
+                               
+                               conditionalPanel("input.maps_present == 'maps_pre_delta'",
+                                                h5("Maps"),
+                                                p("These maps show the spatial pattern of changes projected by GCMs from 
+                                                  current climate (BASELINE). The average ensemble projection across GCMs
+                                                  is also shown (ENSEMBLE)"),
+                                                h5("Visualization options"),
+                                                radioButtons("type_map1", "Pixel values to display",
+                                                             c("Absolute variation from current climate" = "plain",
+                                                               "Relative variation from current climate (%)" = "perc"),
+                                                             selected = "plain", inline = T),
+                                                radioButtons("add_layer2", "Overlay on maps:",
+                                                             c("Do not overlay anything" = "nothing",
+                                                               "Country borders" = "countries",
+                                                               "Biomes" = "biomes",
+                                                               "Ecoregions" = "ecoregions"),
+                                                             selected = "nothing")#,
+                                                )
+                               )
+                             ),
                            
                            mainPanel(
+                             column(1),
+                             column(11,
+                                    
                              tabsetPanel(id = "maps_present",
                                          selected = "fig_pre_delta",
                                          type = "pills",
@@ -471,166 +444,193 @@ ui <- tagList(
                                          tabPanel(title = "Spread of GCMs",
                                                   value = "fig_pre_delta",
                                                   
-                                                  # textOutput("no_analyze_fig"),
+                                                  hr(),
+                                                  textOutput("no_analyze_fig_pre_A"),
+                                                  hr(),
                                                   
-                                                  # conditionalPanel("input.type_scaled == 'scaled'",
-                                                  #                  plotlyOutput("plot_temp_prec", height = "100%"),
-                                                  #                  hr(),
-                                                  #                  uiOutput("tab3_ideas_for_selecting"), 
-                                                  #                  hr(),
-                                                  #                  tableOutput("comparison_table")),
-                                                  conditionalPanel("input.type_scaled_pre_delta == 'deltas'",
-                                                                   plotlyOutput("plot_temp_prec_deltas", height = "100%"),
-                                                                   hr(),
-                                                                   # uiOutput("tab3_ideas_for_selecting_copy2"),
-                                                                   # hr(),
-                                                                   h5("Table with the underlying data"),
-                                                                   tableOutput("comparison_table_delta")),
-                                                  conditionalPanel("input.type_scaled_pre_delta == 'no_scaled'",
-                                                                   plotlyOutput("plot_temp_prec_no_scaled", height = "100%"),
-                                                                   hr(),
-                                                                   # uiOutput("tab3_ideas_for_selecting_copy"),
-                                                                   # hr(),
-                                                                   h5("Table with the underlying data"),
-                                                                   tableOutput("comparison_table_no_scaled"))
+                                                  conditionalPanel("input.compare_type == 'bio_bio'",
+                                                                   conditionalPanel("input.type_scaled_pre_delta == 'deltas'",
+                                                                                    plotlyOutput("plot_temp_prec_deltas", height = "100%"),
+                                                                                    hr(),
+                                                                                    
+                                                                                    column(3, downloadButton('download_comparison_table_no_scaled', 'Download table')),
+                                                                                    column(3, downloadButton('download_prec_temp_deltas', 'Download figure')),
+                                                                                    column(6, p("Use the buttons on the upper-right corner of the figure to interact or zoom and download (a different version)")),
+                                                                                    hr(), hr(), hr(), hr()
+                                                                   ),
+                                                                   
+                                                                   conditionalPanel("input.type_scaled_pre_delta == 'no_scaled'",
+                                                                                    plotlyOutput("plot_temp_prec_no_scaled", height = "100%"),
+                                                                                    hr(),
+                                                                                    
+                                                                                    column(3, downloadButton('download_comparison_table_no_scaled2', 'Download table')),
+                                                                                    column(3, downloadButton('download_prec_temp_unscaled', 'Download figure')),
+                                                                                    column(6, p("Use the buttons on the upper-right corner of the figure to interact or zoom and download (a different version)")),
+                                                                                    hr(), hr(), hr(), hr()),
+                                                                   
+                                                                   h5("Table with difference data"),
+                                                                   tableOutput("comparison_table_no_scaled")
+                                                                   ),
+                                                  
+                                                  conditionalPanel("input.compare_type == 'bio_several'",
+                                                                   
+                                                                   p("These results are not available when the comparison involves more than a pair a bioclimatic 
+                                                                                       variables. For this comparison, values in variables need to be scaled before they are combined, 
+                                                                                       and for this reason the only scatterplot produced is the one for scaled differences to the 
+                                                                                       average ensemble. Find it in the tab 'Variation among futures' choosing scaled differences on the side panel."),
+                                                                   hr())
+                                                  
+                                                  
                                          ),
                                          
-                                         tabPanel(title = "Maps of differences (GCM - baseline)",
+                                         tabPanel(title = "Maps of differences (GCM - Baseline)",
                                                   value = "maps_pre_delta",
-                                                  uiOutput("delta_patterns"))#,
-                                         
-                                         # tabPanel(title = "Explore in detail",
-                                         #          value = "leaflet_pre_delta",
-                                         #          leaflet::leafletOutput("map_pre_delta", height = 600))
+                                                  
+                                                  hr(),
+                                                  textOutput("no_analyze_fig_pre_B"),
+                                                  hr(),
+                                                  
+                                                  conditionalPanel("input.type_map1 == 'plain'",
+                                                                   uiOutput("delta_patterns")
+                                                  ),
+                                                  conditionalPanel("input.type_map1 == 'perc'",
+                                                                   uiOutput("deltaperc_patterns")
+                                                                   )
+                                                  )
+                                         ))
                              )
                            )
-             )
     ),
     
-    
-    ### MAPS (I): Explore GCMS
+    ### Compare among future Climates
     tabPanel(title = "VARIATION AMONG FUTURES",
              value = "future",
              
              sidebarLayout(position = "left",
                            fluid = TRUE,
                            sidebarPanel(
-                             wellPanel(#12,
-                                    h5("SELECTED OPTIONS:"),
-                                    textOutput("selected_gcms_fut_tab"),
-                                    textOutput("selected_scenario_fut_tab"),
-                                    textOutput("selected_comparison_fut_tab"),
-                                    hr(),
-                                    
-                                    h4("Variation among futures"),
-                                    p("Results displayed here focus on differences within the universe of selected GCMs. 
-                                      As a first step, a mean ensemble climate projection is calculated by averaging the
-                                      value in each downscaled GCM on a pixel basis. Then, the value in each model is 
-                                      compared to the ensemble, to determine whether its projection is greater or smaller 
-                                      than the average."),
-                                    hr(),
-                                    conditionalPanel("input.future_panel == 'fig_table'",
-                                                     h5("Scatterplot"),
-                                                     p("The scatterplot is centered on the average ensemble, 
-                                                       and each GCM is plotted using their mean difference to the ensemble values. 
-                                                       Difference values can be displayed scaled or unscaled (preserving the layers’ units)."),
-                                                     radioButtons(inputId = "type_scaled",
-                                                                  label = NULL,
-                                                                  choices = c("Scaled differences to ensemble" = "scaled",
-                                                                              "Unscaled differences to ensemble" = "unscaled"
-                                                                              # "Delta values (only 1x1 comparison)" = "deltas",
-                                                                              # "Raw values (only 1x1 comparison)" = "no_scaled"
-                                                                  ),
-                                                                  selected = "scaled"),
-                                                     p("When the comparison uses scaled values, several variables are permitted in each
-                                                       axis used in a combined fashion, allowing for comparing differences in more than 
-                                                       two variables altogether. When using this approach, only variables that are comparable 
-                                                       should be combined in one axis (i.e. precipitation and temperature variables should not
-                                                       be combined, and only variables that vary in the same fashion –that is, larger means greater,
-                                                       shorter means smaller– should be mixed). In this scaled figure, a 95% confidence level of 
-                                                       the ensemble mean is drawn to highlight the models that do not differ larger than these limits
-                                                       in their projections."),
-                                                     conditionalPanel("input.type_scaled == 'scaled'",
-                                                                      downloadButton('download_prec_temp_scaled', 'Download figure')),
-                                                     conditionalPanel("input.type_scaled == 'unscaled'",
-                                                                      downloadButton('download_prec_temp_realunscaled', 'Download figure')),
-                                                     hr(),
-                                                     downloadButton('download_comparison_table', 'Download table'),
-                                                     downloadButton('download_comparison_table_realunscaled', 'Download table realuns')
-                                                     ),
-                                    conditionalPanel("input.future_panel == 'maps_fut_diff'",
-                                                     h5("Maps"),
-                                                     p("These maps show the spatial distribution of each GCM deviations 
-                                                       from the mean ensemble for each bioclimatic variable."),
-                                                     h5("Visualization options"),
-                                                     radioButtons("add_layer3", "Overlay on maps:",
-                                                                  c("Do not overlay anything" = "nothing",
-                                                                    "Country borders" = "countries",
-                                                                    "Biomes" = "biomes",
-                                                                    "Ecoregions" = "ecoregions"),
-                                                                  selected = "nothing"))
-                                    )
-               ),
-               
-               mainPanel(
-                 
-                 tabsetPanel(id = "future_panel",
-                             selected = "fig_table",
-                             type = "pills",
-                             # type = "tabs",
-                             
-                             tabPanel(title = "Spread of GCMs",
-                                      value = "fig_table",
-                                      
-                                      textOutput("no_analyze_fig"),
-                                      
-                                      conditionalPanel("input.type_scaled == 'scaled'",
-                                                       plotlyOutput("plot_temp_prec", height = "100%"),
-                                                       hr(),
-                                                       # uiOutput("tab3_ideas_for_selecting"), 
-                                                       # hr(),
-                                                       h5("Table with the underlying data"),
-                                                       tableOutput("comparison_table")),
-                                      conditionalPanel("input.type_scaled == 'unscaled'",
-                                                       plotlyOutput("plot_temp_prec_realunscaled", height = "100%"),
-                                                       hr(),
-                                                       # uiOutput("tab3_ideas_for_selecting"), 
-                                                       hr())#,
-                                      # tableOutput("comparison_table"))#,
-                                      # conditionalPanel("input.type_scaled == 'deltas'",
-                                      #                  plotlyOutput("plot_temp_prec_deltas", height = "100%"),
-                                      #                  hr(),
-                                      #                  uiOutput("tab3_ideas_for_selecting_copy2"),
-                                      #                  hr(),
-                                      #                  tableOutput("comparison_table_delta")),
-                                      # conditionalPanel("input.type_scaled == 'no_scaled'",
-                                      #                  plotlyOutput("plot_temp_prec_no_scaled", height = "100%"),
-                                      #                  hr(),
-                                      #                  uiOutput("tab3_ideas_for_selecting_copy"),
-                                      #                  hr(),
-                                      #                  tableOutput("comparison_table_no_scaled"))
+                             style = "position:fixed;width:inherit;",
+                             wellPanel(
+                               h5("SELECTED OPTIONS:"),
+                               textOutput("selected_gcms_fut_tab"),
+                               textOutput("selected_scenario_fut_tab"),
+                               textOutput("selected_comparison_fut_tab"),
+                               hr(),
+                               
+                               h4("Variation among futures"),
+                               p("Results displayed here focus on differences within the universe of selected GCMs. 
+                                 As a first step, an average ensemble climate projection is calculated by averaging the
+                                 value in each downscaled GCM on a pixel basis. Then, the value in each model is 
+                                 compared to the ensemble, to determine whether its projection is greater or smaller 
+                                 than the average."),
+                               hr(),
+                               conditionalPanel("input.future_panel == 'fig_table'",
+                                                h5("Scatterplot"),
+                                                p("The scatterplot is centered on the average ensemble, 
+                                                  and each GCM is plotted using their mean difference to the ensemble values."),
+                                                radioButtons(inputId = "type_scaled",
+                                                             label = NULL,
+                                                             choices = c("Scaled differences to ensemble" = "scaled",
+                                                                         "Unscaled differences to ensemble" = "unscaled"
+                                                             ),
+                                                             selected = "scaled"),
+                                                
+                                                conditionalPanel("input.type_scaled == 'scaled'",
+                                                                 p("The circle indicates 2 standard deviations")),
+                                                hr()
+                                                ),
+                               conditionalPanel("input.future_panel == 'maps_fut_diff'",
+                                                h5("Maps"),
+                                                p("These maps show the spatial distribution of each GCM deviations 
+                                                  from the mean ensemble for each bioclimatic variable."),
+                                                hr(),
+                                                
+                                                h5("Visualization options"),
+                                                
+                                                radioButtons("type_map2", "Pixel values to display",
+                                                                    c("Absolute variation from ensemble" = "plain",
+                                                                      "Relative variation from ensemble (%)" = "perc"),
+                                                                    selected = "plain", inline = T),
+                                                radioButtons("add_layer3", "Overlay on maps:",
+                                                             c("Do not overlay anything" = "nothing",
+                                                               "Country borders" = "countries",
+                                                               "Biomes" = "biomes",
+                                                               "Ecoregions" = "ecoregions"),
+                                                             selected = "nothing"))
+                               )
                              ),
+                           
+                           mainPanel(
+                             column(1),
+                             column(11,
                              
-                             tabPanel(title = "Maps of differences (GCM - Ensemble)",
-                                      value = "maps_fut_diff",
-                                      
-                                      uiOutput("gcm_differences")
-                             )#,
-                             
-                             # tabPanel(title = "Explore differences in detail",
-                             #          value = "maps_fut_detail",
-                             #          
-                             #          leaflet::leafletOutput("map_fut_detail", height = 600)
-                             # )
-                 )
-                 
-                 
-               )
-             )
-    ),
+                             tabsetPanel(id = "future_panel",
+                                         selected = "fig_table",
+                                         type = "pills",
+                                         
+                                         tabPanel(title = "Spread of GCMs",
+                                                  value = "fig_table",
+                                                  
+                                                  conditionalPanel("input.type_scaled == 'scaled'",
+                                                                   hr(),
+                                                                   textOutput("no_analyze_fig_fut_A"),
+                                                                   
+                                                                   plotlyOutput("plot_temp_prec", height = "100%"),
+                                                                   hr(),
+                                                                   
+                                                                   column(3, downloadButton('download_comparison_table', 'Download table')),
+                                                                   column(3, downloadButton('download_prec_temp_scaled', 'Download figure')),
+                                                                   column(6, p("Use the buttons on the upper-right corner of the figure to interact or zoom and download (a different version)")),
+                                                                   hr(), hr(), hr(), hr(),
+                                                                   
+                                                                   h5("Table with difference data"),
+                                                                   tableOutput("comparison_table")),
+                                                  
+                                                  conditionalPanel("input.type_scaled == 'unscaled'",
+                                                                   
+                                                                   conditionalPanel("input.compare_type == 'bio_bio'",
+                                                                                    
+                                                                                    plotlyOutput("plot_temp_prec_realunscaled", height = "100%"),
+                                                                                    hr(), 
+                                                                                    
+                                                                                    column(3, downloadButton('download_comparison_table_realunscaled', 'Download table')),
+                                                                                    column(3, downloadButton('download_prec_temp_realunscaled', 'Download figure')),
+                                                                                    column(6, p("Use the buttons on the upper-right corner of the figure to interact or zoom and download (a different version)")),
+                                                                                    hr(), hr(), hr(), hr(),
+                                                                                    
+                                                                                    h5("Table with difference data"),
+                                                                                    tableOutput("comparison_table_realunscaled"),
+                                                                                    hr()),
+                                                                   
+                                                                   conditionalPanel("input.compare_type == 'bio_several'",
+                                                                                    
+                                                                                    p("These results are not available when the comparison involves more than a pair a bioclimatic 
+                                                                                       variables. For this comparison, values in variables need to be scaled before they are combined, 
+                                                                                       and for this reason the only scatterplot produced is the one for scaled differences to the 
+                                                                                       average ensemble. Find it in the tab 'Variation among futures' choosing scaled differences on the side panel."),
+                                                                                    hr())
+                                                                   )#,
+                                         ),
+                                         
+                                         tabPanel(title = "Maps of differences (GCM - Ensemble)",
+                                                  value = "maps_fut_diff",
+                                                  
+                                                  hr(),
+                                                  textOutput("no_analyze_fig_fut_B"),
+                                                  hr(),
+                                                  conditionalPanel("input.type_map2 == 'plain'",
+                                                                   uiOutput("gcm_differences")
+                                                                   ),
+                                                  conditionalPanel("input.type_map2 == 'perc'",
+                                                                   uiOutput("gcm_differences_perc")
+                                                                   )
+                                                  )
+                                         ))
+                             )
+                           )
+             ),
     
-    #### TAB 4: REPORT
-    
+    #### Report download
     tabPanel(title = "REPORT",
              mainPanel(
                column(5),
@@ -651,7 +651,7 @@ ui <- tagList(
                       downloadButton("report", "Generate report",
                                      style="color: #fff; background-color: #57be91; 
                                      border-color: #2e6da4; font-size:140%; padding-left:10px"))
+               )
              )
-             )
-    )
-)
+      )
+  )

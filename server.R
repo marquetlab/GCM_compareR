@@ -1,22 +1,10 @@
 library(shiny)
-# library(shinythemes)
-
 library(tidyverse)
-# library(devtools)
 library(kableExtra)
-
-#devtools::install_github("javierfajnolla/gcmcompareR")
-#library(gcmcompareR)
-
 library(raster)
-
-# library(shinyjs)
-# library(shinycssloaders)
-# library(shinysky)
 library(plotly)
 library(leaflet)
 library(leaflet.extras)
-
 # Maps
 library(sp)
 library(sf)
@@ -24,7 +12,8 @@ library(rgdal)
 library(fasterize)
 library(maps)
 library(maptools)
-# print(getwd())
+
+# Spatial data
 world <- maps::map("world", fill = TRUE, plot = FALSE)
 world_map <- map2SpatialPolygons(world, sub(":.*$", "", world$names))
 world_map <- SpatialPolygonsDataFrame(world_map,
@@ -38,26 +27,26 @@ ecorregions <- read_sf("data/Ecoregions2017.shp")
 ecorregions_sp <- readOGR("data", "Ecoregions2017")
 
 
-# Available GCMs
+# Table of available GCMs
 table_GCMs <- read_csv("data/GCMs_details.csv") %>% 
   dplyr::select(-"Actual name")
+
 
 ##############################################################################################################################################################################
 ########################################    SERVER   ######################################################################################################################
 ##############################################################################################################################################################################
 
 
-# initialize module parameters list
+# Initialize object to store reactive values
 rvs <- reactiveValues(ext_user = extent(-180, 180, -60, 90),
                       still_no_analyse = NULL,
                       available_gcms = NULL)
 
 
-# Define server logic required to draw a histogram
+
 server <- function(input, output) {
   
-  glue::glue("#   primer mensaje") %>% message()
-  
+
   # ##################################################
   # #### Prepare input values and hide options
   # ##################################################
@@ -75,10 +64,8 @@ server <- function(input, output) {
   output$bio_to_plot <- eventReactive(input$bio_to_plot, TRUE, ignoreInit = TRUE)
   output$map_pre_delta_gcm <- eventReactive(input$map_pre_delta_gcm, TRUE, ignoreInit = TRUE)
   output$map_pre_delta_bio <- eventReactive(input$map_pre_delta_bio, TRUE, ignoreInit = TRUE)
-  # output$type_scaled <- eventReactive(input$type_scaled, TRUE, ignoreInit = TRUE)
-
-  # The key is suspendWhenHidden = FALSE
-  outputOptions(output, "sel_gcms", suspendWhenHidden = FALSE)
+  
+  outputOptions(output, "sel_gcms", suspendWhenHidden = FALSE)   # The key is suspendWhenHidden = FALSE
   outputOptions(output, "bio_vars", suspendWhenHidden = FALSE)
   outputOptions(output, "selection_gcms", suspendWhenHidden = FALSE)
   outputOptions(output, "res_sel", suspendWhenHidden = FALSE)
@@ -91,22 +78,17 @@ server <- function(input, output) {
   outputOptions(output, "gcm_to_plot", suspendWhenHidden = FALSE)
   outputOptions(output, "map_pre_delta_gcm", suspendWhenHidden = FALSE)
   outputOptions(output, "map_pre_delta_bio", suspendWhenHidden = FALSE)
-  # outputOptions(output, "type_scaled", suspendWhenHidden = FALSE)
-  
   
   # Disable results tab until input$go is used
   observeEvent(input$go == 1,{
-    
     if(input$go == 0){    #If true enable, else disable
       js$disabletab("abc")
     }else{
       js$enabletab("abc")
     }
-    
   })
   
-  ### Remove old saved results if GO! is pressed again, so these results are not included in 
-  ### the report
+  ### Remove old saved results if ANALYZE! is pressed again, so these results are not included in new reports
   observeEvent(input$go, {
     rvs$saved_bbox <- NULL
     rvs$plot_comp_download_unscaled <- NULL
@@ -119,8 +101,7 @@ server <- function(input, output) {
   })
   
   
-  
-  # Table of Available GCMs and data
+  # Generate table of available GCMs
   output$GCMs_table <- function(){
     table_GCMs %>%
       knitr::kable("html") %>%
@@ -132,10 +113,9 @@ server <- function(input, output) {
   #### Scenario selection tab
   ##################################################
   
-  ########### CODE FOR UI ###########
+  ########### CODE FOR UI - RenderUI panels ###########
   
   ### Available GCMs - dynamically change
-  # For "scenario - scenario_map" tab  (definition scenario) - MAIN OPTIONS SELECTION
   observe({
     output$selection_gcms <- renderUI({
       glue::glue("# Getting list of available GCMs") %>% message
@@ -162,7 +142,7 @@ server <- function(input, output) {
   })
   
   
-  ### SELECTED OPTIONS
+  ### DEFAULT SELECTED OPTIONS
   observe({
     n_gcms <- length(input$sel_gcms)
     output$selected_gcms <- renderText(
@@ -183,7 +163,7 @@ server <- function(input, output) {
   })
   
   
-  # Hide unselection of GCMs
+  # Hide unselection of GCMs (so it unfolds when clicked)
   observeEvent(input$GCMs_button, {
     if (input$GCMs_button %% 2 == 1){
       shinyjs::hide(id = "selected_gcms", anim = T)
@@ -194,22 +174,22 @@ server <- function(input, output) {
     }
   })
   
-  # Hide Climate Change Scenario
+  # Hide Climate Change Scenario (so it unfolds when clicked)
   observeEvent(input$CC_scenario, {
     if (input$CC_scenario %% 2 == 1){
       shinyjs::show(id = "year_type", anim = T)
       shinyjs::show(id = "rcp_type", anim = T)
-      shinyjs::show(id = "res_sel", anim = T)
+      # shinyjs::show(id = "res_sel", anim = T)
       shinyjs::hide(id = "selected_scenario", anim = T)
     } else {
       shinyjs::hide(id = "year_type", anim = T)
       shinyjs::hide(id = "rcp_type", anim = T)
-      shinyjs::hide(id = "res_sel", anim = T)
+      # shinyjs::hide(id = "res_sel", anim = T)
       shinyjs::show(id = "selected_scenario", anim = T)
     }
   })
   
-  # Hide Type of comparison   
+  # Hide Type of comparison  (so it unfolds when clicked)
   observeEvent(input$Compar_type, {
     if (input$Compar_type %% 2 == 1){
       shinyjs::show(id = "compare_type", anim = T)
@@ -224,19 +204,19 @@ server <- function(input, output) {
     }
   })
   
-  ### Disable download buttons at the beggining
-  shinyjs::disable("download_prec_temp")
-  observeEvent(input$go, {
-    shinyjs::enable("download_prec_temp")
-  })
-  
-  # shinyjs::disable("download_comparison_table")
+  # ### Disable download buttons at the beggining     # Ya no sería necesario, porque se bloquean las pestañas
+  # shinyjs::disable("download_prec_temp")
   # observeEvent(input$go, {
-  #   shinyjs::enable("download_comparison_table")
+  #   shinyjs::enable("download_prec_temp")
   # })
   # 
+  # # shinyjs::disable("download_comparison_table")
+  # # observeEvent(input$go, {
+  # #   shinyjs::enable("download_comparison_table")
+  # # })
+  # # 
   
-  ### Bioclims to compare
+  ### List of bioclims to compare
   # One to One comparison
   output$compare_type_bio_bio <- renderUI({
     conditionalPanel(condition = "input.compare_type == 'bio_bio'",
@@ -287,7 +267,7 @@ server <- function(input, output) {
                                  multiple = FALSE, 
                                  selected = "(bio 12) Annual Precipitation"))
   })
-  ## With multiple comparisons
+  ## Multiple comparisons
   output$compare_type_bio_several <- renderUI({
     conditionalPanel(condition = "input.compare_type == 'bio_several'",
                      selectInput(inputId = "bio_several_x", 
@@ -338,30 +318,9 @@ server <- function(input, output) {
                                  selected = c("(bio 12) Annual Precipitation", "(bio 13) Precipitation of Wettest Month")))
   })
   
-  
-  # ### Available GCMs - dynamically change For scenario - scenario_individual" tab (tab 1 - scenario definition - detail)
-  # output$map_individual <- renderUI({
-  #   glue::glue("# Getting list of available GCMs") %>% message
-  #   scenarios <- list.files(paste0("clim_data/ccafs/rds"), pattern = input$res_sel) %>%
-  #     dplyr::as_tibble() %>%
-  #     magrittr::set_names("GCM") %>%
-  #     tidyr::separate(col = GCM, into = c("gcm_", "resolution_", "year_", "rcp_", "borrar"), sep = "\\.") %>% dplyr::select(-borrar) %>%
-  #     mutate(year_ = year_ %>% str_replace_all("year", ""),
-  #            rcp_ = rcp_ %>% str_replace_all("rcp", ""))
-  #   glue::glue("#   - Available GCMs with current setting") %>% message
-  #   available_gcms <- scenarios %>%
-  #     filter(resolution_ == input$res_sel) %>%
-  #     filter(year_ == input$year_type) %>%
-  #     filter(rcp_ == input$rcp_type %>% str_replace("rcp", "")) %>%
-  #     pull(gcm_)
-  #   glue::glue("#   - Generating GCMs options") %>% message
-  #   selectInput(inputId = "gcm_to_plot", "Select a GCM",
-  #               choices  = available_gcms)
-  # })
-  
-  
-  ######## MAPPING      
-  ### Area study map
+
+  #### MAP      
+  ### Leaflet interactive map
   # create map
   m <- leaflet(world_sf) %>% 
     addTiles() %>%
@@ -380,10 +339,11 @@ server <- function(input, output) {
                    # editOptions = editToolbarOptions())
   
   output$map <- renderLeaflet(m)
+  
   # create map proxy to make further changes to existing map
   map <- leafletProxy("map")
   
-  
+  # Code that updates the map depending on study area inputs and selections
   observe({
     # Extent selected by drawing rectangle
     if (input$extent_type == "map_draw") {
@@ -484,9 +444,9 @@ server <- function(input, output) {
       
       rvs$polySelXY <- selected_countries
       
+      ### Get coordinates for later use to crop and mask GCM rasters
       req(input$map_draw_new_feature)
       glue::glue("#>   Crop Country layer to the extent drawn") %>% message
-      # Get coordinates
       coords <- unlist(input$map_draw_new_feature$geometry$coordinates)
       xy <- matrix(c(coords[c(TRUE,FALSE)], coords[c(FALSE,TRUE)]), ncol = 2) %>% 
         unique %>% 
@@ -537,9 +497,9 @@ server <- function(input, output) {
       
       rvs$polySelXY <- selected_biomes
       
+      ### Get coordinates for later use to crop and mask GCM rasters
       req(input$map_draw_new_feature)
       glue::glue("#>   Crop biomes layer to the extent drawn") %>% message
-      # Get coordinates
       coords <- unlist(input$map_draw_new_feature$geometry$coordinates)
       xy <- matrix(c(coords[c(TRUE,FALSE)], coords[c(FALSE,TRUE)]), ncol = 2) %>% 
         unique %>% 
@@ -586,9 +546,9 @@ server <- function(input, output) {
       
       rvs$polySelXY <- selected_ecorregions
       
+      ### Get coordinates for later use to crop and mask GCM rasters
       req(input$map_draw_new_feature)
       glue::glue("#>   Crop ecorregions layer to the extent drawn") %>% message
-      # Get coordinates
       coords <- unlist(input$map_draw_new_feature$geometry$coordinates)
       xy <- matrix(c(coords[c(TRUE,FALSE)], coords[c(FALSE,TRUE)]), ncol = 2) %>% 
         unique %>% 
@@ -604,12 +564,20 @@ server <- function(input, output) {
   })
   
   
+
+  ####################################################################################
+  #### RESULTS
+  ####################################################################################
   
-  ####################################################################################
-  #### Load layers
-  ####################################################################################
+  
+  ############### INTERNAL CALCULATIONS - COMPARISONS ###############
+  
+  #### Comparison of GCMs and analyses ####
+  
+  ### Load raster data
+  
   reactive({
-    # When hidden options for GCM selection, consider some default
+    # When hidden options for GCM selection, consider some default to avoid errors
     glue::glue("# DEF: Getting list of available GCMs") %>% message
     scenarios <- list.files(paste0("clim_data/ccafs/rds"), pattern = input$res_sel) %>% 
       dplyr::as_tibble() %>% 
@@ -684,10 +652,9 @@ server <- function(input, output) {
   })
   
   
-  ####################################################################################
-  #### Create ensemble, deltas and differences
-  ####################################################################################
   
+  
+  ########### RESULTS: CALCULATIONS WITH RASTER DATA ############
   
   observeEvent(input$go, {
     withProgress(message = 'Loading climatic data',
@@ -697,35 +664,49 @@ server <- function(input, output) {
                    ### Load variables
                    glue::glue("#>>   Loading climatic data") %>% message
                    if(!is.null(input$sel_gcms)){
-                     # clim_vars_files <- paste0("clim_data/ccafs/raw_rasters/",
-                     #                           input$sel_gcms, ".", 
-                     #                           input$res_sel, 
+                     # Load .tif data
+                     # clim_vars_files <- paste0(input$sel_gcms, ".",
+                     #                           input$res_sel,
                      #                           ".year", input$year_type, ".",
-                     #                           input$rcp_type, 
-                     #                           ".grd")
+                     #                           input$rcp_type) %>% 
+                     #   purrr::map(~list.files("clim_data/ccafs/raw_rasters/",
+                     #                               pattern = .x, 
+                     #                               full.names = T)) %>% 
+                     #   purrr::map(~ raster::stack(.x))
+                     # clim_vars_files <- clim_vars_files %>% 
+                     #   purrr::map(~setNames(.x, names(.x) %>% gsub(".*\\.bio","",.) %>% paste0("bio",.)))
+                     
+                     # Load .rds data
                      clim_vars_files <- paste0("clim_data/ccafs/rds/",
-                                               input$sel_gcms, ".", 
-                                               input$res_sel, 
+                                               input$sel_gcms, ".",
+                                               input$res_sel,
                                                ".year", input$year_type, ".",
-                                               input$rcp_type, 
-                                               ".rds")
+                                               input$rcp_type,
+                                               ".rds") %>%
+                       purrr::map(~ readRDS(.x))
                    } else {
-                     # clim_vars_files <- paste0("clim_data/ccafs/raw_rasters/",
-                     #                           rvs$def_available_gcms, ".", 
-                     #                           input$res_sel, 
+                     # Load .tif data
+                     # clim_vars_files <- paste0(rvs$def_available_gcms, ".",
+                     #                           input$res_sel,
                      #                           ".year", input$year_type, ".",
-                     #                           input$rcp_type, 
-                     #                           ".grd")
+                     #                           input$rcp_type) %>% 
+                     #   purrr::map(~list.files("clim_data/ccafs/raw_rasters/",
+                     #                         pattern = .x, 
+                     #                         full.names = T)) %>% 
+                     #   purrr::map(~ raster::stack(.x))
+                     # clim_vars_files <- clim_vars_files %>% 
+                     #   purrr::map(~setNames(.x, names(.x) %>% gsub(".*\\.bio","",.) %>% paste0("bio",.)))
+                     
+                     # Load .rds data
                      clim_vars_files <- paste0("clim_data/ccafs/rds/",
                                                rvs$def_available_gcms, ".",
                                                input$res_sel,
                                                ".year", input$year_type, ".",
                                                input$rcp_type,
-                                               ".rds")
+                                               ".rds") %>%
+                       purrr::map(~ readRDS(.x))
                    }
                    rvs$clim_vars_complete <- clim_vars_files %>%
-                     # purrr::map(~ raster::stack(.x)) %>%
-                     purrr::map(~ readRDS(.x)) %>%
                      magrittr::set_names(input$sel_gcms)
                    
                    # Select a subset of bioclim variables
@@ -734,11 +715,11 @@ server <- function(input, output) {
                    rvs$clim_vars <- rvs$clim_vars_complete %>%
                      purrr::map(~ raster::subset(.x, subset = c(rvs$bio_vars_x2, rvs$bio_vars_y2)))
                    
-                   ### Crop to study area
+                   # Crop to study area
                    incProgress(amount = 0.1, message = "Cropping to study area")
                    req(rvs$polySelXY)
                    glue::glue("#>>   Cropping to study area") %>% message
-                   # When it is not a polygon
+                   ## When it is not a polygon
                    if (!is(rvs$polySelXY, "sf")){
                      rvs$clim_vars <- rvs$clim_vars %>%
                        purrr::map(~ raster::crop(.x, rvs$polySelXY))
@@ -747,7 +728,7 @@ server <- function(input, output) {
                      rvs$sf_country <- world_sf %>% 
                        st_crop(xmin = xmin(rvs$polySelXY), xmax = xmax(rvs$polySelXY), ymin = ymin(rvs$polySelXY), ymax = ymax(rvs$polySelXY))
                    }
-                   # When it is a polygon
+                   ## When it is a polygon
                    if (is(rvs$polySelXY, "sf")){
                      glue::glue("#     - Rasterizing polygon") %>% message
                      rvs$polySelXY <- rvs$polySelXY %>% 
@@ -760,7 +741,6 @@ server <- function(input, output) {
                                                                                    ymax(extent(rvs$polySelXY)))))
                      
                      glue::glue("#     - Masking") %>% message
-                     # message(rvs$polySelXY)
                      rvs$clim_vars <- rvs$clim_vars %>%
                        purrr::map(~ raster::crop(.x, rvs$polySelXY_r)) %>%
                        purrr::map(~ raster::mask(.x, rvs$polySelXY_r))
@@ -768,9 +748,8 @@ server <- function(input, output) {
                      # Save a copy of croped countries
                      rvs$sf_country <- rvs$polySelXY
                    }
-                   # message(class(rvs$sf_country))
-                   # plot(rvs$sf_country)
-                   ### Divide by 10 layers
+                   
+                   ### Divide by 10 some layers (temperature)
                    glue::glue("#>>  Transforming temperature layers to regular units of ºC") %>% message
                    for (i in 1:length(rvs$clim_vars)){
                      for (j in names(rvs$clim_vars[[i]])[names(rvs$clim_vars[[i]]) %in% c("bio_1", "bio_2", "bio_4", "bio_5", "bio_6", "bio_7", "bio_8", "bio_9", "bio_10", "bio_11")]){
@@ -778,12 +757,17 @@ server <- function(input, output) {
                      }
                    }
                    
-                   ### Comapre each GCM with baseline
+                   ## Difference with ensemble of future projections
+                   ### Compare each GCM with baseline
                    incProgress(amount = 0.3, message = "Comparing GCMs with baseline")
                    glue::glue("#>>   Loading and preparing baseline") %>% message
+                   
                    # Load baseline
-                   # rvs$clim_baseline_complete <- stack(paste0("clim_data/baseline/raw_rasters/baseline_ccafs.", input$res_sel, ".gri"))
-                   rvs$clim_baseline_complete <- readRDS(paste0("clim_data/baseline/rds/baseline.", input$res_sel, ".rds"))
+                   ## Loading .tif data
+                   rvs$clim_baseline_complete <- paste0("clim_data/baseline/raw_rasters/baseline.", input$res_sel, ".bio_", 1:19, ".tif") %>% 
+                     stack %>% setNames(names(.) %>% gsub(".*\\.bio","",.) %>% paste0("bio",.))
+                   ## Loading .rds data
+                   # rvs$clim_baseline_complete <- readRDS(paste0("clim_data/baseline/rds/baseline.", input$res_sel, ".rds"))
                    rvs$clim_baseline <- rvs$clim_baseline_complete %>% 
                      crop(extent(rvs$clim_vars[[1]])) %>% 
                      mask(rvs$clim_vars[[1]][[1]])
@@ -794,13 +778,18 @@ server <- function(input, output) {
                      rvs$clim_baseline[[j]] <- rvs$clim_baseline[[j]] / 10
                    }
                    
-                   
-                   
+                   ### Calculate differences to baseline
                    glue::glue("#>>   Comparing GCMs with baseline") %>% message
                    rvs$clim_delta <- rvs$clim_vars %>%
                      purrr::map(~ .x - rvs$clim_baseline)
                    
-                   ### Calculate ensemble
+                   ### Create a map of percentage of differences
+                   rvs$clim_deltaperc <- rvs$clim_vars %>%
+                     purrr::map(~ 100 * (.x - rvs$clim_baseline) / rvs$clim_baseline)
+                   
+                   
+                   ## Difference with ensemble of future projections
+                   ### Calculate ensemble of GCMs
                    incProgress(amount = 0.3, message = "Calculating mean ensemble")
                    glue::glue("#>>   Calculating the ensemble from all different GCM projections") %>% message
                    rvs$clim_ens <- rvs$clim_vars %>%
@@ -808,495 +797,23 @@ server <- function(input, output) {
                      raster::calc(fun = function(x){x / length(rvs$clim_vars)})  # Divide by the number of layers
                    rvs$clim_delta_ensemble <- rvs$clim_ens - rvs$clim_baseline
                    
-                   ### Compare each GCM with ensemble
+                   ### Compare each GCM with the ensemble
                    incProgress(amount = 0.3, message = "Computing differences with ensemble")
                    glue::glue("#>>   Computing differences between each GCM and the GCM ensemble") %>% message
                    rvs$clim_diff <- rvs$clim_vars %>%
                      purrr::map(~ .x - rvs$clim_ens)
+                   
+                   ### Create a map of percentage of differences with ensemble
+                   rvs$clim_diffperc <- rvs$clim_vars %>%
+                     purrr::map(~ 100 * (.x - rvs$clim_ens) / rvs$clim_ens)
+                   
                  })
   })
   
   
-  ####################################################################################
-  ### TAB 2: VISUALIZE GCMs
-  ####################################################################################
   
-  ################# OPTIONS FOR UI #################
-  ### SELECTED OPTIONS
-  observe({
-    n_gcms <- length(input$sel_gcms)
-    output$selected_gcms_2_tab <- renderText(
-      glue::glue("{n_gcms} GCMs") %>% print()
-    )
-    print_rcp <- input$rcp_type %>% str_replace("rcp", "")
-    output$selected_scenario_2_tab <- renderText(
-      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% print()
-    )
-    type_selected_comparison <- case_when(input$compare_type == "bio_bio" ~ c("bio X bio"),
-                                          input$compare_type == "bio_several" ~ "multiple")
-    output$selected_comparison_2_tab <- renderText(
-      glue::glue("Comparison: {type_selected_comparison}") %>% print()
-    )
-  })
-  
-  
-  
-  ####################################################################################
-  ### TAB 3: VISUALIZE DIFFERENCES WITH PRESENT
-  ####################################################################################
-  
-  
-  ########### CODE FOR UI ###########
-  ### SELECTED OPTIONS
-  observe({
-    n_gcms <- length(input$sel_gcms)
-    output$selected_gcms_pre_tab <- renderText(
-      glue::glue("{n_gcms} GCMs") %>% print()
-    )
-    print_rcp <- input$rcp_type %>% str_replace("rcp", "")
-    output$selected_scenario_pre_tab <- renderText(
-      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% print()
-    )
-    type_selected_comparison <- case_when(input$compare_type == "bio_bio" ~ c("bio X bio"),
-                                          input$compare_type == "bio_several" ~ "multiple")
-    output$selected_comparison_pre_tab <- renderText(
-      glue::glue("Comparison: {type_selected_comparison}") %>% print()
-    )
-  })
-  
-  output$no_analyze_tabl <- renderText({
-    if(input$go == 0){
-      glue::glue("A table will values of the comparison will appear here after you define a scenario and press 'Analyze' in the tab 'Definition of scenario'")
-    } else {return()}
-  })
-  output$no_analyze <- renderText({
-    if(input$go == 0){
-      glue::glue("Maps will appear here when you define a scenario and press 'Analyze' in the tab 'Definition of scenario'")
-    } else {return()}
-  })
-  
-  
-  
-  ########### Explore GCM ###########
-  
-  observeEvent({input$go
-    input$add_layer}, {
-      
-      output$gcm_patterns <- renderUI({
-        # if (!is.null(rvs$still_no_analyse)){
-        glue::glue("#> Creating GCM pattern plots") %>% message
-        # plot_gcm_pattern <- plot_gcm_patterns2(rvs$clim_comp,
-        #                                        country_borders = FALSE,
-        #                                        return_ensemble = TRUE)
-        ################################
-        plot_gcm_pattern <- list()
-        
-        for (b in names(rvs$clim_vars[[1]])){
-          # Combine all variables to plot
-          scenario_data <- rvs$clim_vars %>%
-            purrr::map(~ raster::subset(.x, b)) %>%
-            raster::stack()
-          
-          scenario_data <- rvs$clim_ens %>%
-            raster::subset(., b) %>%
-            setNames("ENSEMBLE") %>%
-            stack(scenario_data)
-          
-          scenario_data <- rvs$clim_baseline %>%
-            raster::subset(., b) %>%
-            setNames("BASELINE") %>%
-            stack(scenario_data)
-          
-          long_name <- case_when(b == "bio_1" ~ "(bio 1) Annual Mean Temperature",
-                                 b == "bio_2" ~ "(bio 2) Mean Diurnal Range (Mean of monthly (max temp - min temp))",
-                                 b == "bio_3" ~ "(bio 3) Isothermality (BIO2/BIO7) (* 100)",
-                                 b == "bio_4" ~ "(bio 4) Temperature Seasonality (standard deviation *100)",
-                                 b == "bio_5" ~  "(bio 5) Max Temperature of Warmest Month",
-                                 b == "bio_6" ~  "(bio 6) Min Temperature of Coldest Month",
-                                 b == "bio_7" ~  "(bio 7) Temperature Annual Range (BIO5-BIO6)",
-                                 b == "bio_8" ~  "(bio 8) Mean Temperature of Wettest Quarter",
-                                 b == "bio_9" ~  "(bio 9) Mean Temperature of Driest Quarter",
-                                 b == "bio_10" ~ "(bio 10) Mean Temperature of Warmest Quarter",
-                                 b == "bio_11" ~ "(bio 11) Mean Temperature of Coldest Quarter",
-                                 b == "bio_12" ~ "(bio 12) Annual Precipitation",
-                                 b == "bio_13" ~ "(bio 13) Precipitation of Wettest Month",
-                                 b == "bio_14" ~ "(bio 14) Precipitation of Driest Month",
-                                 b == "bio_15" ~ "(bio 15) Precipitation Seasonality (Coefficient of Variation)",
-                                 b == "bio_16" ~ "(bio 16) Precipitation of Wettest Quarter",
-                                 b == "bio_17" ~ "(bio 17) Precipitation of Driest Quarter",
-                                 b == "bio_18" ~ "(bio 18) Precipitation of Warmest Quarter",
-                                 b == "bio_19" ~ "(bio 19) Precipitation of Coldest Quarter")
-          
-          # Get range of values
-          range_values <- c(min(values(scenario_data), na.rm = T),
-                            max(values(scenario_data), na.rm = T))
-          range_by <- (range_values[2] - range_values[1]) / 100
-          
-          # Plot
-          scenario_plot <- scenario_data %>%
-            rasterVis::levelplot(main = paste0(long_name, " - raw GCMs"),
-                                 # layout = lp_layout,
-                                 at = seq(range_values[[1]],
-                                          range_values[[2]],
-                                          by = range_by))
-          if (input$add_layer == "countries"){
-            sp_add <- world_map %>% crop(extent(rvs$clim_vars[[1]]))
-            scenario_plot <- scenario_plot +
-              latticeExtra::layer(sp::sp.polygons(sp_add,
-                                                  lwd = 3,
-                                                  alpha = 0.8,
-                                                  col = "black"),
-                                  data = list(sp_add = sp_add))
-          }
-          if (input$add_layer == "biomes"){
-            sp_add <- biomes_sp %>% crop(extent(rvs$clim_vars[[1]]))
-            scenario_plot <- scenario_plot +
-              latticeExtra::layer(sp::sp.polygons(sp_add,
-                                                  lwd = 3,
-                                                  alpha = 0.8,
-                                                  col = "black"),
-                                  data = list(sp_add = sp_add))
-          }
-          if (input$add_layer == "ecoregions"){
-            sp_add <- ecorregions_sp %>% crop(extent(rvs$clim_vars[[1]]))
-            scenario_plot <- scenario_plot +
-              latticeExtra::layer(sp::sp.polygons(sp_add,
-                                                  lwd = 3,
-                                                  alpha = 0.8,
-                                                  col = "black"),
-                                  data = list(sp_add = sp_add))
-          }
-          
-          plot_gcm_pattern[[length(plot_gcm_pattern) + 1]] <- scenario_plot
-          names(plot_gcm_pattern)[length(plot_gcm_pattern)] <- b
-          rm(scenario_plot)
-        }
-        rvs$plot_gcm_pattern <- plot_gcm_pattern
-        ########################################################
-        
-        glue::glue("#> Manipulating plot pattern list") %>% message
-        for (i in 1:length(plot_gcm_pattern)) {
-          local({
-            my_i <- i
-            plotname <- paste0("plot_pattern", my_i)
-            output[[plotname]] <- renderPlot({
-              plot_gcm_pattern[[my_i]]
-            }, height = 1000)
-          })
-        }
-        
-        glue::glue("#> Printing plot pattern") %>% message
-        plot_gcm_pattern_ui <- lapply(1:length(plot_gcm_pattern), function(i) {
-          plotname <- paste0("plot_pattern", i)
-          plotOutput(plotname, height = "100%")
-        })
-        do.call(tagList, plot_gcm_pattern_ui) %>%      # Convert the list to a tagList
-          withSpinner(type = 7, color = "#5fbc93")
-        # } else {""}
-      })
-    })
-  
-  
-  
-  ########### Explore Deltas ###########
-  
-  
-  observeEvent(input$go, {
-    
-    output$delta_patterns <- renderUI({
-      # if (!is.null(rvs$still_no_analyse)){
-      glue::glue("#> Creating delta pattern plots") %>% message
-      # plot_gcm_pattern <- plot_gcm_patterns2(rvs$clim_comp,
-      #                                        country_borders = FALSE,
-      #                                        return_ensemble = TRUE)
-      ################################
-      plot_delta_pattern <- list()
-      
-      for (b in names(rvs$clim_delta[[1]])){
-        # Combine all variables to plot
-        scenario_data <- rvs$clim_delta %>%
-          purrr::map(~ raster::subset(.x, b)) %>%
-          raster::stack()
-        
-        # scenario_data <- rvs$clim_baseline %>%
-        #   raster::subset(., b) %>%
-        #   setNames("BASELINE") %>%
-        #   stack(scenario_data)
-        
-        long_name <- case_when(b == "bio_1" ~ "(bio 1) Annual Mean Temperature",
-                               b == "bio_2" ~ "(bio 2) Mean Diurnal Range (Mean of monthly (max temp - min temp))",
-                               b == "bio_3" ~ "(bio 3) Isothermality (BIO2/BIO7) (* 100)",
-                               b == "bio_4" ~ "(bio 4) Temperature Seasonality (standard deviation *100)",
-                               b == "bio_5" ~  "(bio 5) Max Temperature of Warmest Month",
-                               b == "bio_6" ~  "(bio 6) Min Temperature of Coldest Month",
-                               b == "bio_7" ~  "(bio 7) Temperature Annual Range (BIO5-BIO6)",
-                               b == "bio_8" ~  "(bio 8) Mean Temperature of Wettest Quarter",
-                               b == "bio_9" ~  "(bio 9) Mean Temperature of Driest Quarter",
-                               b == "bio_10" ~ "(bio 10) Mean Temperature of Warmest Quarter",
-                               b == "bio_11" ~ "(bio 11) Mean Temperature of Coldest Quarter",
-                               b == "bio_12" ~ "(bio 12) Annual Precipitation",
-                               b == "bio_13" ~ "(bio 13) Precipitation of Wettest Month",
-                               b == "bio_14" ~ "(bio 14) Precipitation of Driest Month",
-                               b == "bio_15" ~ "(bio 15) Precipitation Seasonality (Coefficient of Variation)",
-                               b == "bio_16" ~ "(bio 16) Precipitation of Wettest Quarter",
-                               b == "bio_17" ~ "(bio 17) Precipitation of Driest Quarter",
-                               b == "bio_18" ~ "(bio 18) Precipitation of Warmest Quarter",
-                               b == "bio_19" ~ "(bio 19) Precipitation of Coldest Quarter")
-        
-        # Get range of values
-        range_values <- c(min(values(scenario_data), na.rm = T),
-                          max(values(scenario_data), na.rm = T))
-        range_values <- c(- max(abs(range_values)), max(abs(range_values)))
-        range_by <- (range_values[2] - range_values[1]) / 100
-        
-        # Plot
-        scenario_plot <- scenario_data %>%
-          rasterVis::levelplot(main = paste0(long_name, " - Deltas"),
-                               par.settings = rasterVis::RdBuTheme(region = rev(RColorBrewer::brewer.pal(9, 'RdGy'))),
-                               # layout = lp_layout,
-                               at = seq(range_values[[1]],
-                                        range_values[[2]],
-                                        by = range_by))
-        if (input$add_layer2 == "countries"){
-          sp_add <- world_map %>% crop(extent(rvs$clim_vars[[1]]))
-          scenario_plot <- scenario_plot +
-            latticeExtra::layer(sp::sp.polygons(sp_add,
-                                                lwd = 3,
-                                                alpha = 0.8,
-                                                col = "black"),
-                                data = list(sp_add = sp_add))
-        }
-        if (input$add_layer2 == "biomes"){
-          sp_add <- biomes_sp %>% crop(extent(rvs$clim_vars[[1]]))
-          scenario_plot <- scenario_plot +
-            latticeExtra::layer(sp::sp.polygons(sp_add,
-                                                lwd = 3,
-                                                alpha = 0.8,
-                                                col = "black"),
-                                data = list(sp_add = sp_add))
-        }
-        if (input$add_layer2 == "ecoregions"){
-          sp_add <- ecorregions_sp %>% crop(extent(rvs$clim_vars[[1]]))
-          scenario_plot <- scenario_plot +
-            latticeExtra::layer(sp::sp.polygons(sp_add,
-                                                lwd = 3,
-                                                alpha = 0.8,
-                                                col = "black"),
-                                data = list(sp_add = sp_add))
-        }
-        
-        plot_delta_pattern[[length(plot_delta_pattern) + 1]] <- scenario_plot
-        names(plot_delta_pattern)[length(plot_delta_pattern)] <- b
-        rm(scenario_plot)
-      }
-      ########################################################
-      rvs$plot_delta_pattern <- plot_delta_pattern
-      
-      
-      glue::glue("#> Manipulating plot delta pattern list") %>% message
-      for (i in 1:length(plot_delta_pattern)) {
-        local({
-          my_i <- i
-          plotname <- paste0("plot_delta_pattern", my_i)
-          output[[plotname]] <- renderPlot({
-            plot_delta_pattern[[my_i]]
-          }, height = 1000)
-        })
-      }
-      
-      glue::glue("#> Printing delta pattern") %>% message
-      plot_delta_pattern_ui <- lapply(1:length(plot_delta_pattern), function(i) {
-        plotname <- paste0("plot_delta_pattern", i)
-        plotOutput(plotname, height = "100%")
-      })
-      do.call(tagList, plot_delta_pattern_ui) %>%      # Convert the list to a tagList
-        withSpinner(type = 7, color = "#5fbc93")
-      # } else {""}
-    })
-  })
-  
-  
-  ############ Visualize Deltas individually ############
-  
-  ### Available GCMs - dynamically change
-  # For "current - maps_pre_detail" tab (tab 1 - scenario definition - detail)
-  output$map_pre_delta_gcm <- renderUI({
-    glue::glue("# Getting list of available GCMs") %>% message
-    scenarios <- list.files(paste0("clim_data/ccafs/rds"), pattern = input$res_sel) %>% 
-      dplyr::as_tibble() %>%
-      magrittr::set_names("GCM") %>%
-      tidyr::separate(col = GCM, into = c("gcm_", "resolution_", "year_", "rcp_", "borrar"), sep = "\\.") %>% dplyr::select(-borrar) %>%
-      mutate(year_ = year_ %>% str_replace_all("year", ""),
-             rcp_ = rcp_ %>% str_replace_all("rcp", ""))
-    glue::glue("#   - Available GCMs with current setting") %>% message
-    available_gcms <- scenarios %>%
-      filter(resolution_ == input$res_sel) %>%
-      filter(year_ == input$year_type) %>%
-      filter(rcp_ == input$rcp_type %>% str_replace("rcp", "")) %>%
-      pull(gcm_)
-    glue::glue("#   - Generating GCMs options") %>% message
-    selectInput(inputId = "map_pre_delta_gcm", "Select a GCM",
-                choices  = available_gcms,
-                selected = available_gcms[1])
-  })
-  
-  output$map_pre_delta_bio <- renderUI({
-    selectInput(inputId = "map_pre_delta_bio",
-                label = NULL,
-                choices = rvs$bio_vars_all, 
-                selected = rvs$bio_vars_all[1])
-  })
-  
-  ### create map for visualization of future differences
-  map_pre_delt <- leaflet(world_sf) %>%
-    setView(0, 0, zoom = 2) %>% 
-    addProviderTiles("Esri.WorldPhysical", group = "Relieve") %>% 
-    addTiles(options = providerTileOptions(noWrap = TRUE), group = "Countries") %>%
-    addLayersControl(baseGroups = c("Relieve", "Countries"),
-                     options = layersControlOptions(collapsed = FALSE))
-  
-  output$map_pre_delta <- renderLeaflet(map_pre_delt)
-  # create map proxy to make further changes to existing map
-  map_pre_delta <- leafletProxy("map_pre_delta")
-  map_pre_delta %>%
-    addProviderTiles("Esri.WorldPhysical")
-  
-  ### Display selected map
-  observeEvent({input$map_pre_delta_gcm
-    input$map_pre_delta_bio}, {
-      # observeEvent(input$add_map,{  
-      req(rvs$clim_delta)         # Stop it from crashing when no result has been produced         
-      
-      # if(input$add_map == TRUE){
-      glue::glue("#>  - ADDING RASTER TO LEAFLET") %>% message
-      
-      rvs$delta_layer <- rvs$clim_delta[[input$map_pre_delta_gcm]][[input$map_pre_delta_bio]]
-      
-      ## Range of values and color palette from them
-      rvs$delta_stack <- rvs$clim_delta %>% 
-        purrr::map(~ .x[[input$map_pre_delta_bio]]) %>% 
-        raster::stack()
-      glue::glue("#>   Calculating data limits") %>% message
-      range_values <- c(min(values(rvs$delta_stack), na.rm = T),
-                        max(values(rvs$delta_stack), na.rm = T))
-      range_values <- c(- max(abs(range_values)), max(abs(range_values)))
-      
-      glue::glue("#>   Making color palette") %>% message
-      pal <- colorNumeric(palette = c("#c0002d", "#f8f5f5", "#0069a8"), 
-                          domain = range_values,
-                          na.color = "transparent",
-                          reverse = TRUE)
-      
-      # Add polygons to leaflet
-      glue::glue("#>   Including the raster to leaflet") %>% message
-      map_pre_delta %>%
-        clearControls() %>%    # Refreshes the legend
-        clearGroup("map_pre_delta") %>%
-        fitBounds(lng1 = extent(rvs$delta_layer)[1],    # ponerse alrededor de la capa
-                  lat1 = extent(rvs$delta_layer)[3], 
-                  lng2 = extent(rvs$delta_layer)[2], 
-                  lat2 = extent(rvs$delta_layer)[4]) %>% 
-        addRasterImage(rvs$delta_layer,
-                       colors = pal,
-                       opacity = 0.8,
-                       group = "map_pre_delta") %>%
-        addLegend(pal = pal, 
-                  values = range_values,
-                  group = "map_pre_delta",
-                  labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE)))
-      
-      rvs$allow_download_layer_pre_delta <- TRUE  # Signal to permit download
-    })
-  
-  
-  ### Download layer
-  output$allow_download_layer_pre_delta <- downloadHandler(
-    filename = function() {
-      paste0("gcm_compareR_", input$map_pre_delta_gcm, "_", input$year_type, "_", input$rcp_type, "_", input$map_pre_delta_bio, "_", input$res_sel, ".", input$download_raster_format)
-    },
-    content = function(file) {
-      writeRaster(rvs$delta_layer, 
-                  file,
-                  format = case_when(input$download_pre_delta_format == "grd" ~ "raster",
-                                     input$download_pre_delta_format == "tif" ~ "GTiff"),
-                  overwrite = TRUE)
-    }
-  )
-  # Disable it until a layer is shown
-  shinyjs::disable("download_raster_format")
-  observeEvent(rvs$allow_download_layer_pre_delta, {
-    shinyjs::enable("download_raster_format")
-  })
-  shinyjs::disable("download_mapIII")
-  observeEvent(rvs$allow_download_layer_pre_delta, {
-    shinyjs::enable("download_mapIII")
-  })
-  
-  
-  
-  
-  ####################################################################################
-  ### TAB 3 - FUTURE (DIFFERENCES BETWEEN GCMs)
-  ####################################################################################
-  
-  
-  ################# OPTIONS FOR UI #################
-  ### SELECTED OPTIONS
-  observe({
-    n_gcms <- length(input$sel_gcms)
-    output$selected_gcms_fut_tab <- renderText(
-      glue::glue("{n_gcms} GCMs") %>% print()
-    )
-    print_rcp <- input$rcp_type %>% str_replace("rcp", "")
-    output$selected_scenario_fut_tab <- renderText(
-      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% print()
-    )
-    type_selected_comparison <- case_when(input$compare_type == "bio_bio" ~ c("bio X bio"),
-                                          input$compare_type == "bio_several" ~ "multiple")
-    output$selected_comparison_fut_tab <- renderText(
-      glue::glue("Comparison: {type_selected_comparison}") %>% print()
-    )
-  })
-  
-  ###### Disable non-scaled option if more than 2 variables
-  shinyjs::disable("type_scaled")
-  
-  output$no_analyze_fig <- renderText({
-    if(input$go == 0){
-      glue::glue("A scatterplot will values of the comparison will appear here after you define a scenario and press 'Analyze' in the tab 'Definition of scenario'")
-    } else {return()}
-  })
-  
-  # observeEvent(input$go, {   # Usar esto hace que se ponga gris al cambiar aunque antes no le des a ANALYZE
-  observeEvent(input$compare_type, {
-    if (input$compare_type == "bio_bio"){
-      shinyjs::enable("type_scaled")
-    }
-    if (input$compare_type == "bio_several"){
-      shinyjs::disable("type_scaled")
-    }
-  })
-  
-  ## Text between scatterplot and table
-  output$tab3_ideas_for_selecting <- renderUI({
-    if (input$go == 0) {""} else {
-      includeMarkdown("Rmd/tab3_ideas_for_selecting.Rmd")
-    }
-  })
-  output$tab3_ideas_for_selecting_copy <- renderUI({
-    if (input$go == 0) {""} else {
-      includeMarkdown("Rmd/tab3_ideas_for_selecting_copy.Rmd")
-    }
-  })
-  output$tab3_ideas_for_selecting_copy2 <- renderUI({
-    if (input$go == 0) {""} else {
-      includeMarkdown("Rmd/tab3_ideas_for_selecting_copy2.Rmd")
-    }
-  })
-  
-  
-  
-  ################## CALCULATIONS FOR SCATTERPLOT AND TABLE ##################
+
+  ################## RESULTS: SCATTERPLOTs  ##################
   
   observeEvent({#input$type_scaled
     # input$type_scaled_pre_delta
@@ -1311,7 +828,6 @@ server <- function(input, output) {
                    
                    ##### Axis and column labels
                    if(input$compare_type == "bio_bio"){
-                     glue::glue("#   1 hola") %>% message()
                      rvs$xaxis_lab <- case_when(rvs$bio_vars_x2 %in% paste0("bio_", c(1:2, 5:11)) ~ paste0(rvs$bio_vars_x_full, " (ºC)"),
                                                 rvs$bio_vars_x2 %in% paste0("bio_", c(12:19)) ~ paste0(rvs$bio_vars_x_full, " (mm)"),
                                                 rvs$bio_vars_x2 %in% paste0("bio_", c(3:4)) ~ paste0(rvs$bio_vars_x2, ""))
@@ -1320,13 +836,11 @@ server <- function(input, output) {
                                                 rvs$bio_vars_y2 %in% paste0("bio_", c(3:4)) ~ paste0(rvs$bio_vars_y2, ""))
                    }
                    if(input$compare_type == "bio_several"){
-                     glue::glue("#   1b") %>% message()
                      rvs$xaxis_lab <- paste0(rvs$bio_vars_x2, collapse = " - ")
                      rvs$yaxis_lab <- paste0(rvs$bio_vars_y2, collapse = " - ")
                    }
                    
                    if(input$compare_type == "bio_bio"){
-                     glue::glue("#   2") %>% message()
                      rvs$xcol_sc_lab <- paste0(rvs$bio_vars_x2, "(scaled)")
                      rvs$ycol_sc_lab <- paste0(rvs$bio_vars_y2, "(scaled)")
                      
@@ -1370,22 +884,18 @@ server <- function(input, output) {
                        purrr::map(~ .x[[v]]) %>%
                        purrr::map_dfc(~ raster::values(.x)) %>% t() %>% 
                        scale()
-                     glue::glue("#   Creating table of differences -2") %>% message()
                      temp_table <- temp_table %>%
                        as.data.frame() %>%
                        tibble::rownames_to_column("GCM") %>%
                        tibble::as_tibble()
-                     glue::glue("#   Creating table of differences -3") %>% message()
                      table_diff_scaled[[length(table_diff_scaled) + 1]] <- temp_table
                      names(table_diff_scaled)[length(table_diff_scaled)] <- v
                    }
                    # Calculare means for each GCM and combine in one unique table
-                   glue::glue("#   Creating table of differences -4") %>% message()
                    table_diff_scaled <- table_diff_scaled %>%
                      purrr::map_dfc(~ rowMeans(.x[,2:ncol(.x)], na.rm = T)) %>%
                      dplyr::bind_cols(table_diff_scaled[[1]][,1])
                    # Combine temperature and precipitation variables separatedly
-                   glue::glue("#   Creating table of differences -5") %>% message()
                    table_scaled <- tibble::tibble(GCM = table_diff_scaled %>%
                                                     dplyr::select(GCM) %>% dplyr::pull(GCM),
                                                   x_axis = table_diff_scaled %>%
@@ -1419,22 +929,18 @@ server <- function(input, output) {
                      temp_table <- rvs$clim_diff %>%
                        purrr::map(~ .x[[v]]) %>%
                        purrr::map_dfc(~ raster::values(.x)) %>% t()
-                     glue::glue("#   Creating table of differences -2") %>% message()
                      temp_table <- temp_table %>%
                        as.data.frame() %>%
                        tibble::rownames_to_column("GCM") %>%
                        tibble::as_tibble()
-                     glue::glue("#   Creating table of differences -3") %>% message()
                      table_diff_realunscaled[[length(table_diff_realunscaled) + 1]] <- temp_table
                      names(table_diff_realunscaled)[length(table_diff_realunscaled)] <- v
                    }
                    # Calculare means for each GCM and combine in one unique table
-                   glue::glue("#   Creating table of differences -4") %>% message()
                    table_diff_realunscaled <- table_diff_realunscaled %>%
                      purrr::map_dfc(~ rowMeans(.x[,2:ncol(.x)], na.rm = T)) %>%
                      dplyr::bind_cols(table_diff_realunscaled[[1]][,1])
                    # Combine temperature and precipitation variables separatedly
-                   glue::glue("#   Creating table of differences -5") %>% message()
                    table_realunscaled <- tibble::tibble(GCM = table_diff_realunscaled %>%
                                                           dplyr::select(GCM) %>% dplyr::pull(GCM),
                                                         x_axis = table_diff_realunscaled %>%
@@ -1453,7 +959,6 @@ server <- function(input, output) {
                    
                    
                    ##############################  Unscaled  ##############################
-                   glue::glue("#   Creating table of differences -6") %>% message()
                    rvs$clim_vars_uns <- rvs$clim_vars
                    rvs$clim_vars_uns[[length(rvs$clim_vars_uns) + 1]] <- rvs$clim_baseline
                    names(rvs$clim_vars_uns)[length(rvs$clim_vars_uns)] <- "BASELINE"
@@ -1702,20 +1207,20 @@ server <- function(input, output) {
                               tooltip = c("GCM", "Distance", "x_axis", "y_axis"),
                               # tooltip = c("GCM", "Distance", "bio_1", "bio_12"),
                               height = 600) %>%
-                     layout(#xaxis = list(scaleanchor = "y",   # iguala escala de ejes
-                                         # scaleratio = 1),
-                            annotations = list(x = rvs$table_realunscaled$x_axis,    # anotaciones fijas
-                                               y = rvs$table_realunscaled$y_axis,
-                                               text = rvs$table_realunscaled$GCM,
-                                               showarrow = T,
-                                               arrowhead = 4,
-                                               arrowsize = 0.4,
-                                               arrowwidth = 0.4,
-                                               textposition = "center left",
-                                               opacity = 0.5,
-                                               ax = 3,
-                                               font = list(family = "Arial",
-                                                           size = 10)))
+                       layout(#xaxis = list(scaleanchor = "y",   # iguala escala de ejes
+                         # scaleratio = 1),
+                         annotations = list(x = rvs$table_realunscaled$x_axis,    # anotaciones fijas
+                                            y = rvs$table_realunscaled$y_axis,
+                                            text = rvs$table_realunscaled$GCM,
+                                            showarrow = T,
+                                            arrowhead = 4,
+                                            arrowsize = 0.4,
+                                            arrowwidth = 0.4,
+                                            textposition = "center left",
+                                            opacity = 0.5,
+                                            ax = 3,
+                                            font = list(family = "Arial",
+                                                        size = 10)))
                    })
                    
                    
@@ -1805,27 +1310,6 @@ server <- function(input, output) {
                                             ax = 3,
                                             font = list(family = "Arial",
                                                         size = 11)))
-                     
-                     # plot_ly(data = rvs$table_deltas, 
-                     #         x = ~ rvs$table_deltas$x_axis,
-                     #         y = ~ rvs$table_deltas$y_axis,
-                     #         text = ~ rvs$table_deltas$GCM,
-                     #         width = 900, height = 800) %>% 
-                     #   add_markers() %>% 
-                     #   layout(
-                     # xaxis = list(title = rvs$xaxis_lab,
-                     #              zeroline = FALSE),
-                     # yaxis = list(title = rvs$yaxis_lab,
-                     #              zeroline = FALSE),
-                     #     annotations = list(x = rvs$table_deltas$x_axis,    # anotaciones fijas
-                     #                        y = rvs$table_deltas$y_axis,
-                     #                        text = rvs$table_deltas$GCM,
-                     #                        showarrow = T, arrowhead = 4, arrowsize = 0.4, arrowwidth = 0.4,
-                     #                        textposition = "center left",
-                     #                        opacity = 0.5,
-                     #                        ax = 3,
-                     #                        font = list(family = "Arial",
-                     #                                    size = 11)))
                    })
                    
                    
@@ -1844,12 +1328,6 @@ server <- function(input, output) {
                        kable_styling("striped", full_width = F)
                    }
                    
-                   # req(rvs$table_combined)
-                   # rvs$table_combined2 <- rvs$table_combined
-                   # names(rvs$table_combined2)[2] <- rvs$xcol_unsc_lab
-                   # names(rvs$table_combined2)[3] <- rvs$ycol_unsc_lab
-                   # names(rvs$table_combined2)[4] <- paste0("Delta ", rvs$xcol_unsc_lab)
-                   # names(rvs$table_combined2)[5] <- paste0("Delta ", rvs$ycol_unsc_lab)
                    
                    output$comparison_table_realunscaled <- function(){
                      glue::glue("#> Creating temp vs prec table") %>% message
@@ -1858,162 +1336,401 @@ server <- function(input, output) {
                      names(table_realunscaled2)[3] <- rvs$ycol_sc_lab
                      
                      table_realunscaled2 %>%
-                       dplyr::select(-Within_circle) %>%
                        knitr::kable("html") %>%
                        kable_styling("striped", full_width = F)
                    }
                    
                    output$comparison_table_no_scaled <- function(){
                      glue::glue("#> Creating temp vs prec table") %>% message
-                     # table_unscaled2 <- rvs$table_unscaled
-                     # names(table_unscaled2)[2] <- rvs$xcol_unsc_lab
-                     # names(table_unscaled2)[3] <- rvs$ycol_unsc_lab
                      
                      
                      rvs$table_combined2 %>% 
-                       # table_unscaled2 %>%
-                       #   dplyr::select(-Distance) %>%
                        knitr::kable("html") %>%
                        kable_styling("striped", full_width = F)
                    }
-                   # output$comparison_table_delta <- function(){
-                   #   glue::glue("#> Creating temp vs prec table (delta)") %>% message
-                   #   # table_deltas2 <- rvs$table_deltas
-                   #   # names(table_deltas2)[2] <- rvs$xcol_delta_lab
-                   #   # names(table_deltas2)[3] <- rvs$ycol_delta_lab
-                   #   # 
-                   #   # table_combined2 <- rvs$table_combined
-                   #   # names(table_combined2)[2] <- rvs$xcol_unsc_lab
-                   #   # names(table_combined2)[3] <- rvs$ycol_unsc_lab
-                   #   # names(table_combined2)[4] <- paste0("Delta ", rvs$xcol_unsc_lab)
-                   #   # names(table_combined2)[5] <- paste0("Delta ", rvs$ycol_unsc_lab)
-                   #   
-                   #   rvs$table_combined2 %>%
-                   #     # table_deltas2 %>%
-                   #     #   dplyr::select(-Distance) %>%
-                   #     knitr::kable("html") %>%
-                   #     kable_styling("striped", full_width = F)
-                   # }
-                   
-                   ############## DOWNLOAD BUTTONS FOR TABLES AND FIGURES ##############
-                   # Download plots
-                   output$download_prec_temp_scaled <- downloadHandler(
-                     filename = function() {
-                       paste0("plot_temp_prec_", input$year_type, "_", input$rcp_type, ".png")
-                     },
-                     content = function(file) {
-                       ggsave(file,
-                              plot = rvs$plot_comp_download_scaled,
-                              device = "png")#,
-                       # width = 300, height = 300)
-                     }
-                   )
-                   output$download_prec_temp_realunscaled <- downloadHandler(
-                     filename = function() {
-                       paste0("plot_temp_prec_", input$year_type, "_", input$rcp_type, ".png")
-                     },
-                     content = function(file) {
-                       ggsave(file,
-                              plot = rvs$plot_comp_download_realunscaled,
-                              device = "png")#,
-                       # width = 300, height = 300)
-                     }
-                   )
-                   output$download_prec_temp_unscaled <- downloadHandler(
-                     filename = function() {
-                       paste0("plot_temp_prec_", input$year_type, "_", input$rcp_type, ".png")
-                     },
-                     content = function(file) {
-                       ggsave(file,
-                              plot = rvs$plot_comp_download_unscaled,
-                              device = "png")#,
-                       # width = 300, height = 300)
-                     }
-                   )
-                   output$download_prec_temp_deltas <- downloadHandler(
-                     filename = function() {
-                       paste0("plot_temp_prec_", input$year_type, "_", input$rcp_type, ".png")
-                     },
-                     content = function(file) {
-                       ggsave(file,
-                              plot = rvs$plot_comp_download_deltas,
-                              device = "png")#,
-                       # width = 300, height = 300)
-                     }
-                   )
-                   
-                   # Download button
-                   output$download_comparison_table <- downloadHandler(
-                     filename = function() {
-                       paste0("Comparison_tableA_", input$year_type, "_", input$rcp_type, ".csv")
-                     },
-                     content = function(file) {
-                       write.csv(rvs$table_scaled %>%
-                                   mutate(confidence95 = Within_circle) %>% 
-                                   dplyr::select(-Within_circle), 
-                                 file, row.names = F)
-                     }
-                   )
-                   output$download_comparison_table_realunscaled <- downloadHandler(
-                     filename = function() {
-                       paste0("Comparison_tableA_", input$year_type, "_", input$rcp_type, ".csv")
-                     },
-                     content = function(file) {
-                       write.csv(rvs$table_realunscaled,# %>%
-                                   # mutate(confidence95 = Within_circle) %>% 
-                                   # dplyr::select(-Within_circle), 
-                                 file, row.names = F)
-                     }
-                   )
-                   output$download_comparison_table_no_scaled <- downloadHandler(
-                     filename = function() {
-                       paste0("Comparison_tableB_", input$year_type, "_", input$rcp_type, ".csv")
-                     },
-                     content = function(file) {
-                       write.csv(rvs$table_combined2, 
-                                 file, row.names = F)
-                     }
-                   )
                    
                  })
   })
   
   
+  ############## RESULTS: MAP PLOTS   ##############
   
-  ############### GCM DIFFERENCES ###############
+  #### 1. Explore selected GCMs #####
+  
+  observeEvent({input$go
+    input$add_layer}, {
+      
+      output$gcm_patterns <- renderUI({
+        glue::glue("#> Creating GCM pattern plots") %>% message
+        
+        plot_gcm_pattern <- list()
+        
+        for (b in names(rvs$clim_vars[[1]])){
+          # Combine all variables to plot
+          scenario_data <- rvs$clim_vars %>%
+            purrr::map(~ raster::subset(.x, b)) %>%
+            raster::stack()
+          
+          scenario_data <- rvs$clim_ens %>%
+            raster::subset(., b) %>%
+            setNames("ENSEMBLE") %>%
+            stack(scenario_data)
+          
+          scenario_data <- rvs$clim_baseline %>%
+            raster::subset(., b) %>%
+            setNames("BASELINE") %>%
+            stack(scenario_data)
+          
+          long_name <- case_when(b == "bio_1" ~ "Annual Mean Temperature (bio 1, °C) ",
+                                 b == "bio_2" ~ "Mean Diurnal Range (Mean of monthly (bio 2, °C))",
+                                 b == "bio_3" ~ "Isothermality (bio 3, bio2/bio7 * 100)",
+                                 b == "bio_4" ~ "Temperature Seasonality (bio 4, standard deviation *100)",
+                                 b == "bio_5" ~  "Max Temperature of Warmest Month (bio 5, °C) ",
+                                 b == "bio_6" ~  "Min Temperature of Coldest Month (bio 6, °C)",
+                                 b == "bio_7" ~  "Temperature Annual Range (bio 7, °C)",
+                                 b == "bio_8" ~  "Mean Temperature of Wettest Quarter (bio 8, °C)",
+                                 b == "bio_9" ~  "Mean Temperature of Driest Quarter (bio 9, °C)",
+                                 b == "bio_10" ~ "Mean Temperature of Warmest Quarter (bio 10, °C)",
+                                 b == "bio_11" ~ "Mean Temperature of Coldest Quarter (bio 11, °C)",
+                                 b == "bio_12" ~ "Annual Precipitation (bio 12, mm)",
+                                 b == "bio_13" ~ "Precipitation of Wettest Month (bio 13, mm)",
+                                 b == "bio_14" ~ "Precipitation of Driest Month (bio 14, mm)",
+                                 b == "bio_15" ~ "Precipitation Seasonality (bio 15, coefficient of variation)",
+                                 b == "bio_16" ~ "Precipitation of Wettest Quarter (bio 16, mm)",
+                                 b == "bio_17" ~ "Precipitation of Driest Quarter (bio 17, mm)",
+                                 b == "bio_18" ~ "Precipitation of Warmest Quarter (bio 18, mm)",
+                                 b == "bio_19" ~ "Precipitation of Coldest Quarter (bio 19, mm)")
+          
+          # Get range of values
+          range_values <- c(min(values(scenario_data), na.rm = T),
+                            max(values(scenario_data), na.rm = T))
+          range_by <- (range_values[2] - range_values[1]) / 100
+          
+          # Plot
+          scenario_plot <- scenario_data %>%
+            rasterVis::levelplot(main = paste0(long_name, " - Unmodified GCMs"),
+                                 # layout = lp_layout,
+                                 at = seq(range_values[[1]],
+                                          range_values[[2]],
+                                          by = range_by))
+          if (input$add_layer == "countries"){
+            sp_add <- world_map %>% crop(extent(rvs$clim_vars[[1]]))
+            scenario_plot <- scenario_plot +
+              latticeExtra::layer(sp::sp.polygons(sp_add,
+                                                  lwd = 1.5,
+                                                  alpha = 0.7,
+                                                  col = "black"),
+                                  data = list(sp_add = sp_add))
+          }
+          if (input$add_layer == "biomes"){
+            sp_add <- biomes_sp %>% crop(extent(rvs$clim_vars[[1]]))
+            scenario_plot <- scenario_plot +
+              latticeExtra::layer(sp::sp.polygons(sp_add,
+                                                  lwd = 1.5,
+                                                  alpha = 0.7,
+                                                  col = "black"),
+                                  data = list(sp_add = sp_add))
+          }
+          if (input$add_layer == "ecoregions"){
+            sp_add <- ecorregions_sp %>% crop(extent(rvs$clim_vars[[1]]))
+            scenario_plot <- scenario_plot +
+              latticeExtra::layer(sp::sp.polygons(sp_add,
+                                                  lwd = 1.5,
+                                                  alpha = 0.7,
+                                                  col = "black"),
+                                  data = list(sp_add = sp_add))
+          }
+          
+          plot_gcm_pattern[[length(plot_gcm_pattern) + 1]] <- scenario_plot
+          names(plot_gcm_pattern)[length(plot_gcm_pattern)] <- b
+          rm(scenario_plot)
+        }
+        rvs$plot_gcm_pattern <- plot_gcm_pattern
+        
+        glue::glue("#> Manipulating plot pattern list") %>% message
+        for (i in 1:length(plot_gcm_pattern)) {
+          local({
+            my_i <- i
+            plotname <- paste0("plot_pattern", my_i)
+            output[[plotname]] <- renderPlot({
+              plot_gcm_pattern[[my_i]]
+            }, height = 1000)
+          })
+        }
+        
+        glue::glue("#> Printing plot pattern") %>% message
+        plot_gcm_pattern_ui <- lapply(1:length(plot_gcm_pattern), function(i) {
+          plotname <- paste0("plot_pattern", i)
+          plotOutput(plotname, height = "100%")
+        })
+        do.call(tagList, plot_gcm_pattern_ui) %>%      # Convert the list to a tagList
+          withSpinner(type = 7, color = "#5fbc93")
+        
+        
+      })
+    })
+  
+  ##### 2. Variation from present #####
   
   observeEvent(input$go, {
+
+    ### Plot differences with present - Plain values
+    output$delta_patterns <- renderUI({
+      # if (!is.null(rvs$still_no_analyse)){
+      glue::glue("#> Creating delta pattern plots") %>% message
+      
+      plot_delta_pattern <- list()
+
+      for (b in names(rvs$clim_delta[[1]])){
+        
+        # Combine all variables to plot
+        scenario_data <- rvs$clim_delta %>%
+          purrr::map(~ raster::subset(.x, b)) %>%
+          raster::stack()
+
+        # scenario_data <- rvs$clim_baseline %>%
+        #   raster::subset(., b) %>%
+        #   setNames("BASELINE") %>%
+        #   stack(scenario_data)
+
+        long_name <- case_when(b == "bio_1" ~ "Annual Mean Temperature (bio 1, °C) ",
+                               b == "bio_2" ~ "Mean Diurnal Range (Mean of monthly (bio 2, °C))",
+                               b == "bio_3" ~ "Isothermality (bio 3, bio2/bio7 * 100)",
+                               b == "bio_4" ~ "Temperature Seasonality (bio 4, standard deviation *100)",
+                               b == "bio_5" ~  "Max Temperature of Warmest Month (bio 5, °C) ",
+                               b == "bio_6" ~  "Min Temperature of Coldest Month (bio 6, °C)",
+                               b == "bio_7" ~  "Temperature Annual Range (bio 7, °C)",
+                               b == "bio_8" ~  "Mean Temperature of Wettest Quarter (bio 8, °C)",
+                               b == "bio_9" ~  "Mean Temperature of Driest Quarter (bio 9, °C)",
+                               b == "bio_10" ~ "Mean Temperature of Warmest Quarter (bio 10, °C)",
+                               b == "bio_11" ~ "Mean Temperature of Coldest Quarter (bio 11, °C)",
+                               b == "bio_12" ~ "Annual Precipitation (bio 12, mm)",
+                               b == "bio_13" ~ "Precipitation of Wettest Month (bio 13, mm)",
+                               b == "bio_14" ~ "Precipitation of Driest Month (bio 14, mm)",
+                               b == "bio_15" ~ "Precipitation Seasonality (bio 15, coefficient of variation)",
+                               b == "bio_16" ~ "Precipitation of Wettest Quarter (bio 16, mm)",
+                               b == "bio_17" ~ "Precipitation of Driest Quarter (bio 17, mm)",
+                               b == "bio_18" ~ "Precipitation of Warmest Quarter (bio 18, mm)",
+                               b == "bio_19" ~ "Precipitation of Coldest Quarter (bio 19, mm)")
+
+        # Get range of values
+        range_values <- c(min(values(scenario_data), na.rm = T),
+                          max(values(scenario_data), na.rm = T))
+        range_values <- c(- max(abs(range_values)), max(abs(range_values)))
+        range_by <- (range_values[2] - range_values[1]) / 100
+
+        # Plot
+        scenario_plot <- scenario_data %>%
+          rasterVis::levelplot(main = paste0(long_name, " - Variation from current climate"),
+                               par.settings = rasterVis::RdBuTheme(region = rev(RColorBrewer::brewer.pal(9, 'RdGy'))),
+                               # layout = lp_layout,
+                               at = seq(range_values[[1]],
+                                        range_values[[2]],
+                                        by = range_by))
+        if (input$add_layer2 == "countries"){
+          sp_add <- world_map %>% crop(extent(rvs$clim_vars[[1]]))
+          scenario_plot <- scenario_plot +
+            latticeExtra::layer(sp::sp.polygons(sp_add,
+                                                lwd = 1.5,
+                                                alpha = 0.7,
+                                                col = "black"),
+                                data = list(sp_add = sp_add))
+        }
+        if (input$add_layer2 == "biomes"){
+          sp_add <- biomes_sp %>% crop(extent(rvs$clim_vars[[1]]))
+          scenario_plot <- scenario_plot +
+            latticeExtra::layer(sp::sp.polygons(sp_add,
+                                                lwd = 1.5,
+                                                alpha = 0.7,
+                                                col = "black"),
+                                data = list(sp_add = sp_add))
+        }
+        if (input$add_layer2 == "ecoregions"){
+          sp_add <- ecorregions_sp %>% crop(extent(rvs$clim_vars[[1]]))
+          scenario_plot <- scenario_plot +
+            latticeExtra::layer(sp::sp.polygons(sp_add,
+                                                lwd = 1.5,
+                                                alpha = 0.7,
+                                                col = "black"),
+                                data = list(sp_add = sp_add))
+        }
+
+        plot_delta_pattern[[length(plot_delta_pattern) + 1]] <- scenario_plot
+        names(plot_delta_pattern)[length(plot_delta_pattern)] <- b
+        rm(scenario_plot)
+      }
+      
+      
+      rvs$plot_delta_pattern <- plot_delta_pattern
+
+      glue::glue("#> Manipulating plot delta pattern list") %>% message
+      for (i in 1:length(plot_delta_pattern)) {
+        local({
+          my_i <- i
+          plotname <- paste0("plot_delta_pattern", my_i)
+          output[[plotname]] <- renderPlot({
+            plot_delta_pattern[[my_i]]
+          }, height = 1000)
+        })
+      }
+
+      glue::glue("#> Printing delta pattern") %>% message
+      plot_delta_pattern_ui <- lapply(1:length(plot_delta_pattern), function(i) {
+        plotname <- paste0("plot_delta_pattern", i)
+        plotOutput(plotname, height = "100%")
+      })
+      do.call(tagList, plot_delta_pattern_ui) %>%      # Convert the list to a tagList
+        withSpinner(type = 7, color = "#5fbc93")
+      # } else {""}
+    })
+    
+    
+    ### Plot differences with present - Percentage of relative variation values
+    output$deltaperc_patterns <- renderUI({
+      # if (!is.null(rvs$still_no_analyse)){
+      glue::glue("#> Creating delta pattern plots") %>% message
+      
+      plot_deltaperc_pattern <- list()
+      
+      for (b in names(rvs$clim_deltaperc[[1]])){
+        
+        # Combine all variables to plot
+        scenario_data <- rvs$clim_deltaperc %>%
+          purrr::map(~ raster::subset(.x, b)) %>%
+          raster::stack()
+        
+        long_name <- case_when(b == "bio_1" ~ "Annual Mean Temperature (bio 1) ",
+                               b == "bio_2" ~ "Mean Diurnal Range (Mean of monthly (bio 2))",
+                               b == "bio_3" ~ "Isothermality (bio 3, bio2/bio7 * 100)",
+                               b == "bio_4" ~ "Temperature Seasonality (bio 4, standard deviation *100)",
+                               b == "bio_5" ~  "Max Temperature of Warmest Month (bio 5) ",
+                               b == "bio_6" ~  "Min Temperature of Coldest Month (bio 6)",
+                               b == "bio_7" ~  "Temperature Annual Range (bio 7)",
+                               b == "bio_8" ~  "Mean Temperature of Wettest Quarter (bio 8)",
+                               b == "bio_9" ~  "Mean Temperature of Driest Quarter (bio 9)",
+                               b == "bio_10" ~ "Mean Temperature of Warmest Quarter (bio 10)",
+                               b == "bio_11" ~ "Mean Temperature of Coldest Quarter (bio 11)",
+                               b == "bio_12" ~ "Annual Precipitation (bio 12)",
+                               b == "bio_13" ~ "Precipitation of Wettest Month (bio 13)",
+                               b == "bio_14" ~ "Precipitation of Driest Month (bio 14)",
+                               b == "bio_15" ~ "Precipitation Seasonality (bio 15, coefficient of variation)",
+                               b == "bio_16" ~ "Precipitation of Wettest Quarter (bio 16)",
+                               b == "bio_17" ~ "Precipitation of Driest Quarter (bio 17)",
+                               b == "bio_18" ~ "Precipitation of Warmest Quarter (bio 18)",
+                               b == "bio_19" ~ "Precipitation of Coldest Quarter (bio 19)")
+        
+        # Define range of values
+        range_values <- c(min(values(scenario_data), na.rm = T),
+                          max(values(scenario_data), na.rm = T))
+        ## No bigger than 100...
+        range_values <- ifelse(range_values > 100, 100, range_values)
+        range_values <- ifelse(range_values < -100, -100, range_values)
+        range_values <- c(- max(abs(range_values)), max(abs(range_values)))
+        range_by <- (range_values[2] - range_values[1]) / 100
+        
+        # Make plot
+        scenario_plot <- scenario_data %>%
+          rasterVis::levelplot(main = paste0(long_name, " - Difference to baseline relative to predicted values (%)"),
+                               at = seq(range_values[[1]],
+                                        range_values[[2]],
+                                        by = range_by))
+        
+        # Add polygon layer
+        if (input$add_layer2 == "countries"){
+          sp_add <- world_map %>% crop(extent(rvs$clim_vars[[1]]))
+          scenario_plot <- scenario_plot +
+            latticeExtra::layer(sp::sp.polygons(sp_add,
+                                                lwd = 1.5,
+                                                alpha = 0.7,
+                                                col = "black"),
+                                data = list(sp_add = sp_add))
+        }
+        if (input$add_layer2 == "biomes"){
+          sp_add <- biomes_sp %>% crop(extent(rvs$clim_vars[[1]]))
+          scenario_plot <- scenario_plot +
+            latticeExtra::layer(sp::sp.polygons(sp_add,
+                                                lwd = 1.5,
+                                                alpha = 0.7,
+                                                col = "black"),
+                                data = list(sp_add = sp_add))
+        }
+        if (input$add_layer2 == "ecoregions"){
+          sp_add <- ecorregions_sp %>% crop(extent(rvs$clim_vars[[1]]))
+          scenario_plot <- scenario_plot +
+            latticeExtra::layer(sp::sp.polygons(sp_add,
+                                                lwd = 1.5,
+                                                alpha = 0.7,
+                                                col = "black"),
+                                data = list(sp_add = sp_add))
+        }
+        
+        plot_deltaperc_pattern[[length(plot_deltaperc_pattern) + 1]] <- scenario_plot
+        names(plot_deltaperc_pattern)[length(plot_deltaperc_pattern)] <- b
+        rm(scenario_plot)
+      }
+
+      rvs$plot_deltaperc_pattern <- plot_deltaperc_pattern
+      
+      glue::glue("#> Manipulating plot delta pattern list") %>% message
+      for (i in 1:length(plot_deltaperc_pattern)) {
+        local({
+          my_i <- i
+          plotname <- paste0("plot_deltaperc_pattern", my_i)
+          output[[plotname]] <- renderPlot({
+            plot_deltaperc_pattern[[my_i]]
+          }, height = 1000)
+        })
+      }
+      
+      glue::glue("#> Printing delta pattern") %>% message
+      plot_deltaperc_pattern_ui <- lapply(1:length(plot_deltaperc_pattern), function(i) {
+        plotname <- paste0("plot_deltaperc_pattern", i)
+        plotOutput(plotname, height = "100%")
+      })
+    
+      do.call(tagList, plot_deltaperc_pattern_ui) %>%      # Convert the list to a tagList
+        withSpinner(type = 7, color = "#5fbc93")
+      
+    })
+    
+  })
+  
+  
+  #### 3. Differences among futures ####
+  
+  observeEvent(input$go, {
+    
+    ### Plot differences among futures - Plain values
     output$gcm_differences <- renderUI({
       glue::glue("#> Creating GCM difference plots") %>% message
-      # plot_gcm_differences <- plot_gcm_differences(rvs$clim_comp,
-      #                                              country_borders = FALSE)
-      ###################################
+      
       plot_gcm_differences <- list()
+      
       for (b in names(rvs$clim_diff[[1]])){
         # Load layers
         scenario_data <- rvs$clim_diff %>%
           purrr::map(~ raster::subset(.x, b)) %>%
           raster::stack()
         
-        long_name <- case_when(b == "bio_1" ~ "(bio 1) Annual Mean Temperature",
-                               b == "bio_2" ~ "(bio 2) Mean Diurnal Range (Mean of monthly (max temp - min temp))",
-                               b == "bio_3" ~ "(bio 3) Isothermality (BIO2/BIO7) (* 100)",
-                               b == "bio_4" ~ "(bio 4) Temperature Seasonality (standard deviation *100)",
-                               b == "bio_5" ~  "(bio 5) Max Temperature of Warmest Month",
-                               b == "bio_6" ~  "(bio 6) Min Temperature of Coldest Month",
-                               b == "bio_7" ~  "(bio 7) Temperature Annual Range (BIO5-BIO6)",
-                               b == "bio_8" ~  "(bio 8) Mean Temperature of Wettest Quarter",
-                               b == "bio_9" ~  "(bio 9) Mean Temperature of Driest Quarter",
-                               b == "bio_10" ~ "(bio 10) Mean Temperature of Warmest Quarter",
-                               b == "bio_11" ~ "(bio 11) Mean Temperature of Coldest Quarter",
-                               b == "bio_12" ~ "(bio 12) Annual Precipitation",
-                               b == "bio_13" ~ "(bio 13) Precipitation of Wettest Month",
-                               b == "bio_14" ~ "(bio 14) Precipitation of Driest Month",
-                               b == "bio_15" ~ "(bio 15) Precipitation Seasonality (Coefficient of Variation)",
-                               b == "bio_16" ~ "(bio 16) Precipitation of Wettest Quarter",
-                               b == "bio_17" ~ "(bio 17) Precipitation of Driest Quarter",
-                               b == "bio_18" ~ "(bio 18) Precipitation of Warmest Quarter",
-                               b == "bio_19" ~ "(bio 19) Precipitation of Coldest Quarter")
+        long_name <- case_when(b == "bio_1" ~ "Annual Mean Temperature (bio 1, °C) ",
+                               b == "bio_2" ~ "Mean Diurnal Range (Mean of monthly (bio 2, °C))",
+                               b == "bio_3" ~ "Isothermality (bio 3, bio2/bio7 * 100)",
+                               b == "bio_4" ~ "Temperature Seasonality (bio 4, standard deviation *100)",
+                               b == "bio_5" ~  "Max Temperature of Warmest Month (bio 5, °C) ",
+                               b == "bio_6" ~  "Min Temperature of Coldest Month (bio 6, °C)",
+                               b == "bio_7" ~  "Temperature Annual Range (bio 7, °C)",
+                               b == "bio_8" ~  "Mean Temperature of Wettest Quarter (bio 8, °C)",
+                               b == "bio_9" ~  "Mean Temperature of Driest Quarter (bio 9, °C)",
+                               b == "bio_10" ~ "Mean Temperature of Warmest Quarter (bio 10, °C)",
+                               b == "bio_11" ~ "Mean Temperature of Coldest Quarter (bio 11, °C)",
+                               b == "bio_12" ~ "Annual Precipitation (bio 12, mm)",
+                               b == "bio_13" ~ "Precipitation of Wettest Month (bio 13, mm)",
+                               b == "bio_14" ~ "Precipitation of Driest Month (bio 14, mm)",
+                               b == "bio_15" ~ "Precipitation Seasonality (bio 15, coefficient of variation)",
+                               b == "bio_16" ~ "Precipitation of Wettest Quarter (bio 16, mm)",
+                               b == "bio_17" ~ "Precipitation of Driest Quarter (bio 17, mm)",
+                               b == "bio_18" ~ "Precipitation of Warmest Quarter (bio 18, mm)",
+                               b == "bio_19" ~ "Precipitation of Coldest Quarter (bio 19, mm)")
         
         # Define range of values
         range_values <- c(min(values(scenario_data), na.rm = T),
@@ -2023,18 +1740,19 @@ server <- function(input, output) {
         
         # Plot
         scenario_plot <- scenario_data %>%
-          rasterVis::levelplot(main = paste0(long_name, " - Spatial difference to ensemble prediction"),
+          rasterVis::levelplot(main = paste0(long_name, " - Units of difference to ensemble prediction"),
                                par.settings = rasterVis::RdBuTheme(region = rev(RColorBrewer::brewer.pal(9, 'RdBu'))),
                                # layout = lp_layout,
                                at = seq(range_values[[1]],
                                         range_values[[2]],
                                         by = range_by))
+        # Add polygon layer
         if (input$add_layer3 == "countries"){
           sp_add <- world_map %>% crop(extent(rvs$clim_vars[[1]]))
           scenario_plot <- scenario_plot +
             latticeExtra::layer(sp::sp.polygons(sp_add,
-                                                lwd = 3,
-                                                alpha = 0.8,
+                                                lwd = 1.5,
+                                                alpha = 0.7,
                                                 col = "black"),
                                 data = list(sp_add = sp_add))
         }
@@ -2042,8 +1760,8 @@ server <- function(input, output) {
           sp_add <- biomes_sp %>% crop(extent(rvs$clim_vars[[1]]))
           scenario_plot <- scenario_plot +
             latticeExtra::layer(sp::sp.polygons(sp_add,
-                                                lwd = 3,
-                                                alpha = 0.8,
+                                                lwd = 1.5,
+                                                alpha = 0.7,
                                                 col = "black"),
                                 data = list(sp_add = sp_add))
         }
@@ -2051,8 +1769,8 @@ server <- function(input, output) {
           sp_add <- ecorregions_sp %>% crop(extent(rvs$clim_vars[[1]]))
           scenario_plot <- scenario_plot +
             latticeExtra::layer(sp::sp.polygons(sp_add,
-                                                lwd = 3,
-                                                alpha = 0.8,
+                                                lwd = 1.5,
+                                                alpha = 0.7,
                                                 col = "black"),
                                 data = list(sp_add = sp_add))
         }
@@ -2061,10 +1779,11 @@ server <- function(input, output) {
         names(plot_gcm_differences)[length(plot_gcm_differences)] <- b
         rm(scenario_plot)
       }
-      ###################################
+      
       rvs$plot_gcm_differences <- plot_gcm_differences
       
-      glue::glue("#> Manipulating plot differences list") %>% message
+      # outputUI
+      glue::glue("#> Preparing plot list for outputIU") %>% message
       for (i in 1:length(plot_gcm_differences)) {
         local({
           my_i <- i
@@ -2084,133 +1803,320 @@ server <- function(input, output) {
       do.call(tagList, plot_gcm_differences_ui) %>%     # Convert the list to a tagList
         withSpinner(type = 7, color = "#5fbc93")
     })
-  })
-  
-  
-  
-  ############################# MAP DETAIL #############################
-  
-  ### Available GCMs - dynamically change
-  # For future - maps_fut_detail" tab (visualization of differences)
-  output$map_fut_detail_gcm <- renderUI({
-    glue::glue("# Getting list of available GCMs") %>% message
-    scenarios <- list.files(paste0("clim_data/ccafs/rds"), pattern = input$res_sel) %>% 
-      dplyr::as_tibble() %>%
-      magrittr::set_names("GCM") %>%
-      tidyr::separate(col = GCM, into = c("gcm_", "resolution_", "year_", "rcp_", "borrar"), sep = "\\.") %>% dplyr::select(-borrar) %>%
-      mutate(year_ = year_ %>% str_replace_all("year", ""),
-             rcp_ = rcp_ %>% str_replace_all("rcp", ""))
-    glue::glue("#   - Available GCMs with current setting") %>% message
-    available_gcms <- scenarios %>%
-      filter(resolution_ == input$res_sel) %>%
-      filter(year_ == input$year_type) %>%
-      filter(rcp_ == input$rcp_type %>% str_replace("rcp", "")) %>%
-      pull(gcm_)
-    glue::glue("#   - Generating GCMs options") %>% message
-    selectInput(inputId = "map_fut_detail_gcm", label = "Select a GCM",
-                choices = available_gcms)
-  })
-  
-  output$map_fut_detail_bio <- renderUI({
-    selectInput(inputId = "map_fut_detail_bio",
-                label = "Select a bioclimatic variable",
-                choices = rvs$bio_vars_all)
-  })
-  
-  ### create map for visualization of future differences
-  map_fut_det <- leaflet(world_sf) %>%
-    setView(0, 0, zoom = 2) %>% 
-    addProviderTiles("Esri.WorldPhysical", group = "Relieve") %>% 
-    addTiles(options = providerTileOptions(noWrap = TRUE), group = "Countries") %>%
-    addLayersControl(baseGroups = c("Relieve", "Countries"),
-                     options = layersControlOptions(collapsed = FALSE))
-  
-  output$map_fut_detail <- renderLeaflet(map_fut_det)
-  # create map proxy to make further changes to existing map
-  map_fut_detail <- leafletProxy("map_fut_detail")
-  map_fut_detail %>%
-    addProviderTiles("Esri.WorldPhysical")
-  
-  ### Display selected map
-  observeEvent({input$map_fut_detail_gcm
-    input$map_fut_detail_bio}, {
-      req(rvs$clim_diff)         # Stop it from crashing when no result has been produced         
+    
+    
+    ### Plot differences among futures - Percentage values
+    
+    output$gcm_differences_perc <- renderUI({
+      plot_gcm_differences_perc <- list()
+      for(b in names(rvs$clim_diffperc[[1]])){
+        scenario_data <- rvs$clim_diffperc %>% 
+          purrr::map(~ raster::subset(.x, b)) %>%
+          raster::stack()
+        
+        long_name <- case_when(b == "bio_1" ~ "Annual Mean Temperature (bio 1) ",
+                               b == "bio_2" ~ "Mean Diurnal Range (Mean of monthly (bio 2))",
+                               b == "bio_3" ~ "Isothermality (bio 3, bio2/bio7 * 100)",
+                               b == "bio_4" ~ "Temperature Seasonality (bio 4, standard deviation *100)",
+                               b == "bio_5" ~  "Max Temperature of Warmest Month (bio 5) ",
+                               b == "bio_6" ~  "Min Temperature of Coldest Month (bio 6)",
+                               b == "bio_7" ~  "Temperature Annual Range (bio 7)",
+                               b == "bio_8" ~  "Mean Temperature of Wettest Quarter (bio 8)",
+                               b == "bio_9" ~  "Mean Temperature of Driest Quarter (bio 9)",
+                               b == "bio_10" ~ "Mean Temperature of Warmest Quarter (bio 10)",
+                               b == "bio_11" ~ "Mean Temperature of Coldest Quarter (bio 11)",
+                               b == "bio_12" ~ "Annual Precipitation (bio 12)",
+                               b == "bio_13" ~ "Precipitation of Wettest Month (bio 13)",
+                               b == "bio_14" ~ "Precipitation of Driest Month (bio 14)",
+                               b == "bio_15" ~ "Precipitation Seasonality (bio 15, coefficient of variation)",
+                               b == "bio_16" ~ "Precipitation of Wettest Quarter (bio 16)",
+                               b == "bio_17" ~ "Precipitation of Driest Quarter (bio 17)",
+                               b == "bio_18" ~ "Precipitation of Warmest Quarter (bio 18)",
+                               b == "bio_19" ~ "Precipitation of Coldest Quarter (bio 19)")
+        
+        # Define range of values
+        range_values <- c(min(values(scenario_data), na.rm = T),
+                          max(values(scenario_data), na.rm = T))
+        ## No bigger than 100...
+        range_values <- ifelse(range_values > 100, 100, range_values)
+        range_values <- ifelse(range_values < -100, -100, range_values)
+        range_values <- c(- max(abs(range_values)), max(abs(range_values)))
+        range_by <- (range_values[2] - range_values[1]) / 100
+        
+        # Make plot
+        scenario_plot <- scenario_data %>%
+          rasterVis::levelplot(main = paste0(long_name, " - Difference to ensemble relative to predicted values (%)"),
+                               at = seq(range_values[[1]],
+                                        range_values[[2]],
+                                        by = range_by))
+        
+        # Add polygon layer
+        if (input$add_layer3 == "countries"){
+          sp_add <- world_map %>% crop(extent(rvs$clim_vars[[1]]))
+          scenario_plot <- scenario_plot +
+            latticeExtra::layer(sp::sp.polygons(sp_add,
+                                                lwd = 1.5,
+                                                alpha = 0.7,
+                                                col = "black"),
+                                data = list(sp_add = sp_add))
+        }
+        if (input$add_layer3 == "biomes"){
+          sp_add <- biomes_sp %>% crop(extent(rvs$clim_vars[[1]]))
+          scenario_plot <- scenario_plot +
+            latticeExtra::layer(sp::sp.polygons(sp_add,
+                                                lwd = 1.5,
+                                                alpha = 0.7,
+                                                col = "black"),
+                                data = list(sp_add = sp_add))
+        }
+        if (input$add_layer3 == "ecoregions"){
+          sp_add <- ecorregions_sp %>% crop(extent(rvs$clim_vars[[1]]))
+          scenario_plot <- scenario_plot +
+            latticeExtra::layer(sp::sp.polygons(sp_add,
+                                                lwd = 1.5,
+                                                alpha = 0.7,
+                                                col = "black"),
+                                data = list(sp_add = sp_add))
+        }
+        
+        plot_gcm_differences_perc[[length(plot_gcm_differences_perc) + 1]] <- scenario_plot
+        names(plot_gcm_differences_perc)[length(plot_gcm_differences_perc)] <- b
+        rm(scenario_plot)
+      }
+      rvs$plot_gcm_differences_perc <- plot_gcm_differences_perc
+      glue::glue("#> Preparing plot list for outputIU") %>% message
+      for (i in 1:length(plot_gcm_differences_perc)) {
+        local({
+          my_i <- i
+          plotname <- paste0("plot_differences_perc", my_i)
+          output[[plotname]] <- renderPlot({
+            plot_gcm_differences_perc[[my_i]]
+          }, height = 1000)
+        })
+      }
       
-      # if(input$add_map == TRUE){
-      glue::glue("#>  - ADDING RASTER TO LEAFLET") %>% message
-      
-      ## Subset raster to map
-      rvs$diff_layer <- rvs$clim_diff[[input$map_fut_detail_gcm]][[input$map_fut_detail_bio]]
-      
-      ## Range of values and color palette from them
-      rvs$diff_stack <- rvs$clim_diff %>% 
-        purrr::map(~ .x[[input$map_fut_detail_bio]]) %>% 
-        raster::stack()
-      glue::glue("#>   Calculating data limits") %>% message
-      range_values <- c(min(values(rvs$diff_stack), na.rm = T),
-                        max(values(rvs$diff_stack), na.rm = T))
-      range_values <- c(- max(abs(range_values)), max(abs(range_values)))
-      
-      glue::glue("#>   Making color palette") %>% message
-      pal <- colorNumeric(palette = c("#c0002d", "#f8f5f5", "#0069a8"), 
-                          domain = range_values,
-                          na.color = "transparent",
-                          reverse = TRUE)
-      
-      # Add polygons to leaflet
-      glue::glue("#>   Including the raster to leaflet") %>% message
-      map_fut_detail %>%
-        clearControls() %>%    # Refreshes the legend
-        clearGroup("map_fut_detail") %>%
-        fitBounds(lng1 = extent(rvs$diff_layer)[1],    # ponerse alrededor de la capa
-                  lat1 = extent(rvs$diff_layer)[3], 
-                  lng2 = extent(rvs$diff_layer)[2], 
-                  lat2 = extent(rvs$diff_layer)[4]) %>% 
-        addRasterImage(rvs$diff_layer,
-                       colors = pal,
-                       opacity = 0.8,
-                       group = "map_fut_detail") %>%
-        addLegend(pal = pal, 
-                  values = range_values,
-                  group = "map_fut_detail",
-                  labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE)))
-      
-      rvs$allow_download_layer_fut_detail <- TRUE  # Signal to permit download
+      glue::glue("#> Printing differences plot") %>% message
+      plot_gcm_differences_perc_ui <- lapply(1:length(plot_gcm_differences_perc), function(i) {
+        plotname <- paste0("plot_differences_perc", i)
+        plotOutput(plotname,
+                   height = "100%")
+      })
+      do.call(tagList, plot_gcm_differences_perc_ui) %>%     # Convert the list to a tagList
+        withSpinner(type = 7, color = "#5fbc93")
     })
+    
+  })
   
-  ### Download layer
-  output$download_map_fut_detail <- downloadHandler(
+   
+  ########## RESULTS: Code for UI - RenderUI panels ############
+  
+  # 2. Selected GCMs
+  ### Selected options
+  observe({
+    n_gcms <- length(input$sel_gcms)
+    output$selected_gcms_2_tab <- renderText(
+      glue::glue("{n_gcms} GCMs") %>% print()
+    )
+    print_rcp <- input$rcp_type %>% str_replace("rcp", "")
+    output$selected_scenario_2_tab <- renderText(
+      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% print()
+    )
+    type_selected_comparison <- case_when(input$compare_type == "bio_bio" ~ c("bio X bio"),
+                                          input$compare_type == "bio_several" ~ "multiple")
+    output$selected_comparison_2_tab <- renderText(
+      glue::glue("Comparison: {type_selected_comparison}") %>% print()
+    )
+  })
+  
+  
+  # 3. Differences from present
+  ### Selected options
+  observe({
+    n_gcms <- length(input$sel_gcms)
+    output$selected_gcms_pre_tab <- renderText(
+      glue::glue("{n_gcms} GCMs") %>% print()
+    )
+    print_rcp <- input$rcp_type %>% str_replace("rcp", "")
+    output$selected_scenario_pre_tab <- renderText(
+      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% print()
+    )
+    type_selected_comparison <- case_when(input$compare_type == "bio_bio" ~ c("bio X bio"),
+                                          input$compare_type == "bio_several" ~ "multiple")
+    output$selected_comparison_pre_tab <- renderText(
+      glue::glue("Comparison: {type_selected_comparison}") %>% print()
+    )
+  })
+  
+  
+  # 4. Differences among futures
+  ### Selected options
+  observe({
+    n_gcms <- length(input$sel_gcms)
+    output$selected_gcms_fut_tab <- renderText(
+      glue::glue("{n_gcms} GCMs") %>% print()
+    )
+    print_rcp <- input$rcp_type %>% str_replace("rcp", "")
+    output$selected_scenario_fut_tab <- renderText(
+      glue::glue("Year {input$year_type}, RCP{print_rcp}, resolution: {input$res_sel}") %>% print()
+    )
+    type_selected_comparison <- case_when(input$compare_type == "bio_bio" ~ c("bio X bio"),
+                                          input$compare_type == "bio_several" ~ "multiple")
+    output$selected_comparison_fut_tab <- renderText(
+      glue::glue("Comparison: {type_selected_comparison}") %>% print()
+    )
+  })
+  
+  ### Disable non-scaled option if more than 2 variables
+  shinyjs::disable("type_scaled")
+  
+  output$no_analyze_fig_gcms <- renderText({
+    if(input$go == 0){
+      glue::glue("Results will be included here once you have defined a scenario in the 'SCENARIO' tab and 'COMPARE' has been pressed")
+    } else {return()}
+  })
+  
+  output$no_analyze_fig_pre_A <- renderText({
+    if(input$go == 0){
+      glue::glue("Results will be included here once you have defined a scenario in the 'SCENARIO' tab and 'COMPARE' has been pressed")
+    } else {return()}
+  })
+  output$no_analyze_fig_pre_B <- renderText({
+    if(input$go == 0){
+      glue::glue("Results will be included here once you have defined a scenario in the 'SCENARIO' tab and 'COMPARE' has been pressed")
+    } else {return()}
+  })
+  
+  
+  output$no_analyze_fig_fut_A <- renderText({
+    if(input$go == 0){
+      glue::glue("Results will be included here once you have defined a scenario in the 'SCENARIO' tab and 'COMPARE' has been pressed")
+    } else {return()}
+  })
+  output$no_analyze_fig_fut_B <- renderText({
+    if(input$go == 0){
+      glue::glue("Results will be included here once you have defined a scenario in the 'SCENARIO' tab and 'COMPARE' has been pressed")
+    } else {return()}
+  })
+  
+  
+  
+  # observeEvent(input$go, {   # Usar esto hace que se ponga gris al cambiar aunque antes no le des a ANALYZE
+  observeEvent(input$compare_type, {
+    if (input$compare_type == "bio_bio"){
+      shinyjs::enable("type_scaled")
+      shinyjs::enable("type_scaled")
+      shinyjs::enable("type_scaled")
+    }
+    if (input$compare_type == "bio_several"){
+      shinyjs::disable("type_scaled")
+      shinyjs::disable("type_scaled")
+      shinyjs::disable("type_scaled")
+    }
+  })
+  
+  
+  
+  ###### Results - Download buttons ######
+  
+  # Download plots
+  output$download_prec_temp_unscaled <- downloadHandler(
     filename = function() {
-      paste0("gcm_compareR_", input$map_fut_detail_gcm, "_", input$year_type, "_", input$rcp_type, "_", input$map_fut_detail_bio, "_", input$res_sel, ".", input$download_raster_format)
+      paste0("GCM_compareR_fig_DifPreA_", input$year_type, "_", input$rcp_type, "_", format(Sys.time(), "%Y-%m-%d"), ".png")
     },
     content = function(file) {
-      writeRaster(rvs$diff_layer, 
-                  file,
-                  format = case_when(input$download_raster_format == "grd" ~ "raster",
-                                     input$download_raster_format == "tif" ~ "GTiff"),
-                  overwrite = TRUE)
+      ggsave(file,
+             plot = rvs$plot_comp_download_unscaled,
+             device = "png")#,
+      # width = 300, height = 300)
     }
   )
-  # Disable it until a layer is shown
-  shinyjs::disable("download_raster_format")
-  observeEvent(rvs$allow_download_layer_fut_detail, {
-    shinyjs::enable("download_raster_format")
-  })
-  shinyjs::disable("download_mapIII")
-  observeEvent(rvs$allow_download_layer_fut_detail, {
-    shinyjs::enable("download_mapIII")
-  })
+  output$download_prec_temp_deltas <- downloadHandler(
+    filename = function() {
+      paste0("GCM_compareR_fig_DifPreB_", input$year_type, "_", input$rcp_type, "_", format(Sys.time(), "%Y-%m-%d"), ".png")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = rvs$plot_comp_download_deltas,
+             device = "png")#,
+      # width = 300, height = 300)
+    }
+  )
+  output$download_prec_temp_scaled <- downloadHandler(
+    filename = function() {
+      paste0("GCM_compareR_fig_DifFutA_", input$year_type, "_", input$rcp_type, "_", format(Sys.time(), "%Y-%m-%d"), ".png")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = rvs$plot_comp_download_scaled,
+             device = "png")#,
+      # width = 300, height = 300)
+    }
+  )
+  output$download_prec_temp_realunscaled <- downloadHandler(
+    filename = function() {
+      paste0("GCM_compareR_fig_DifFutB_", input$year_type, "_", input$rcp_type, "_", format(Sys.time(), "%Y-%m-%d"), ".png")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = rvs$plot_comp_download_realunscaled,
+             device = "png")#,
+      # width = 300, height = 300)
+    }
+  )
   
+  # Download button - TABLES
+  ## Results - compare with present
+  output$download_comparison_table_no_scaled <- downloadHandler(
+    filename = function() {
+      paste0("GCM_compareR_table_DifPre_", input$year_type, "_", input$rcp_type, "_", format(Sys.time(), "%Y-%m-%d"), ".csv")
+    },
+    content = function(file) {
+      write.csv(rvs$table_combined2, 
+                file, row.names = F)
+    }
+  )
+  output$download_comparison_table_no_scaled2 <- downloadHandler(
+    filename = function() {
+      paste0("GCM_compareR_table_DifPre_", input$year_type, "_", input$rcp_type, "_", format(Sys.time(), "%Y-%m-%d"), ".csv")
+    },
+    content = function(file) {
+      write.csv(rvs$table_combined2, 
+                file, row.names = F)
+    }
+  )
+  
+  ## Results - compare among futures
+  output$download_comparison_table <- downloadHandler(
+    filename = function() {
+      paste0("GCM_compareR_table_DifFut_scaled_", input$year_type, "_", input$rcp_type, "_", format(Sys.time(), "%Y-%m-%d"), ".csv")
+    },
+    content = function(file) {
+      write.csv(rvs$table_scaled #%>%
+                  # rename(Inside_2sd = Within_circle) %>% 
+                  # dplyr::select(-Within_circle)
+                  , 
+                file, row.names = F)
+    }
+  )
+  output$download_comparison_table_realunscaled <- downloadHandler(
+    filename = function() {
+      paste0("GCM_compareR_table_DifFut_unscaled_", input$year_type, "_", input$rcp_type, "_", format(Sys.time(), "%Y-%m-%d"), ".csv")
+    },
+    content = function(file) {
+      write.csv(rvs$table_realunscaled,# %>%
+                file, row.names = F)
+    }
+  )
   
 
-  
   ##########################################
   ### Tab 5 -Download report
   ##########################################
   
   output$report <- downloadHandler(
     # For PDF output, change this to "report.pdf"
-    filename = "report.pdf",
+    # filename = "report.pdf",
+    filename = paste0("GCM_compareR_report_", format(Sys.time(), "%Y-%m-%d"), ".pdf"),
     content = function(file) {
       withProgress(message = 'Preparing the report',
                    detail = NULL,
@@ -2238,7 +2144,9 @@ server <- function(input, output) {
                                     plot_realuns = rvs$plot_temp_prec_realunscaled,
                                     map_gcm = rvs$plot_gcm_pattern,
                                     map_delta = rvs$plot_delta_pattern,
-                                    map_dif = rvs$plot_gcm_differences
+                                    map_delta_perc = rvs$plot_deltaperc_pattern,
+                                    map_dif = rvs$plot_gcm_differences,
+                                    map_dif_perc = rvs$plot_gcm_differences_perc
                      )
                      
                      # Knit the document, passing in the `params` list, and eval it in a

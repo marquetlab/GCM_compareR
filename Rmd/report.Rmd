@@ -1,5 +1,5 @@
 ---
-title: "Downloadable report GCM comparer"
+title: "Downloadable report GCM compareR"
 date: "`r format(Sys.time(), '%d/%m, %Y')`"
 output: pdf_document
 params:
@@ -17,22 +17,24 @@ params:
   plot_uns: NA
   map_gcm: NA
   map_delta: NA
+  map_delta_perc: NA
   map_dif: NA
+  map_dif_perc: NA
 bibliography: biblio.bib
 ---
 
 ## Introduction
 
-This report was automatically generated with the gcmcompareR shiny app.
+This report was automatically generated with the GCM compareR shiny app.
 
-The app is intended at assisting ecologists, conservationists and policy makers in the process of selecting subsets of GCMs for their specific needs. It includes options to perform analyses inspired in @Vano2015, and extend the methods with additional quantitative and qualitative routines that include outputs in the form of scatterplots, tables and a diversity of maps. Please, refer to that citation and information provided within the app and this report to find in the following results the GCMs that suit better the needs of your research.
+The app is intended at assisting ecologists, conservationists and policy makers in the process of understanding differences between global circulation models (GCMs) projections on a geographic area, and in the triage of subsets of GCMs for their specific needs. It includes options to perform analyses that assess how different are projections from current climatic conditions and among them.
 
 
 ## Note
 
-This report will report "## NULL" when one of the results has not been visualized in the app. Please, make sure that you create all the results before downloading the report if you want to include these figures in your report.
+This report will print "## NULL" when one of the results has not been visualized in the app. Please, make sure that you create all the results before downloading the report if you want to include these figures in your report.
 
-The only results not included here are the tables underlying the scatterplots. This data can be downloaded in .csv format directly from the app using a specific button located on the left side of the corresponding page.
+The only results not included here are the tables underlying the scatterplots. This data can be downloaded in .csv format directly from the app using a specific button located on the left panel of the corresponding tab.
 
 ## Parameters used for the analysis
 
@@ -92,7 +94,7 @@ params$map_gcm
 ```
 
 \newpage
-### Change from present
+### Variation from present
 
 The results from comparing GCM projections with current climatic conditions (BASELINE) are presented here. They can be used to identify which GCMs forecast larger or smaller changes in climate (e.g. units of increase in mean annual temperature), to diagnose in which direction are produced those changes (e.g. some models might project an average reduction in annual precipitation and others an increase) and to visualize a spatial pattern in the predicted change.
 
@@ -116,20 +118,27 @@ Lastly, the following maps show the spatial variation of the changes projected b
 params$map_delta
 ```
 
+In addition, the next set of maps show the variation as a percentage relative to the climate of each pixel. In some cases, extreme values in temperature or precipitation in a sector of the study area might make difficult the visualization of large changes in other sectors that naturally have smaller values (e.g. changes in precipitation in an arid region next to a humid mountain will not be easy to detect, because the map's color scale is skewed by the large values of the second sector). This visualization shows the projected changes as a percentage of change with respect to the current conditions.
+
+```{r, fig.width = 10, fig.height = 10, echo = FALSE}
+params$map_delta_perc
+```
+
+
 \newpage
-### Change between futures
+### Variation among futures
 
 The following results focus on differences within the universe of selected GCMs. As a first step, a mean ensemble climate projection is calculated by averaging the value in each downscaled GCM on a pixel basis. Then, the value in each model is compared to the ensemble, to determine whether its projection is greater or smaller than the average.
 
 The scatterplots are centered on the average ensemble (0, 0 coordinates), and each GCM is plotted using their mean difference to the ensemble values. 
 
-- This first plot is made with scaled values of differences. A 95% confidence level of the ensemble mean is drawn to highlight the models that do not differ larger than these limits in their projections
+- This first plot is made with scaled values of differences. A circle indicates 2 standard deviations from the ensemble mean.
 
 ```{r echo = FALSE}
 params$plot_sc
 ```
 
-- To the contrary, differences are not scaled in the next plot. The figure is equivalent to those figures included in the _Change from present_ section, but this one is centered on the ensemble, not in the baseline.
+- To the contrary, differences are not scaled in the following plot. The figure is equivalent to those included in the _Variation from present_ tab, but this one is centered on the ensemble, not in the baseline.
 
 ```{r echo = FALSE}
 params$plot_realuns
@@ -141,5 +150,12 @@ The maps show now the spatial distribution of each GCM deviations with respect t
 params$map_dif
 ```
 
+In addition, the next set of maps show the variation as a percentage relative to the climate of each pixel. In some cases, extreme values in temperature or precipitation in a sector of the study area might make difficult the visualization of large changes in other sectors that naturally have smaller values (e.g. changes in precipitation in an arid region next to a humid mountain will not be easy to detect, because the map's color scale is skewed by the large values of the second sector). This visualization shows the projected changes as a percentage of change with respect to the current conditions.
+
+```{r, fig.width = 10, fig.height = 10, echo = FALSE}
+params$map_dif_perc
+```
+
+
 \newpage
-## References
+
