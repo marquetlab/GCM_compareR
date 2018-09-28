@@ -334,7 +334,7 @@ ui <- tagList(
                            fluid = TRUE,
                            
                            sidebarPanel(
-                             
+                             style = "position:fixed;width:inherit;",
                              wellPanel(#12, 
                                h5("SELECTED OPTIONS:"),
                                textOutput("selected_gcms_2_tab"),
@@ -361,13 +361,16 @@ ui <- tagList(
                              ),
                            
                            mainPanel(
+                             column(1),
+                             column(11,
+                                    
+                                    hr(),
+                                    textOutput("no_analyze_fig_gcms"),
+                                    hr(),
                              
-                             hr(),
-                             textOutput("no_analyze_fig_gcms"),
-                             hr(),
-                             
-                             uiOutput("gcm_patterns")
-                             ))),
+                                    uiOutput("gcm_patterns")
+                             )))
+    ),
     
     ### Compare with Present Climate
     tabPanel(title = "VARIATION FROM PRESENT",

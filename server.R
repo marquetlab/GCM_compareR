@@ -1685,7 +1685,8 @@ server <- function(input, output) {
       glue::glue("#> Printing delta pattern") %>% message
       plot_deltaperc_pattern_ui <- lapply(1:length(plot_deltaperc_pattern), function(i) {
         plotname <- paste0("plot_deltaperc_pattern", i)
-        plotOutput(plotname, height = "100%")
+        plotOutput(plotname, 
+                   height = "100%")
       })
     
       do.call(tagList, plot_deltaperc_pattern_ui) %>%      # Convert the list to a tagList
@@ -2004,12 +2005,8 @@ server <- function(input, output) {
   observeEvent(input$compare_type, {
     if (input$compare_type == "bio_bio"){
       shinyjs::enable("type_scaled")
-      shinyjs::enable("type_scaled")
-      shinyjs::enable("type_scaled")
     }
     if (input$compare_type == "bio_several"){
-      shinyjs::disable("type_scaled")
-      shinyjs::disable("type_scaled")
       shinyjs::disable("type_scaled")
     }
   })
