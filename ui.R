@@ -50,6 +50,24 @@ ui <- tagList(
     ),
     
     # css styles
+    
+    ## Style for progressbar
+    tags$head(
+      tags$style(
+        HTML(".shiny-notification {
+             height: 100px;
+             width: 800px;
+             position:fixed;
+             top: calc(50% - 50px);
+             left: calc(50% - 400px);
+             font-size: 150%;
+             text-align: center;
+             }
+             "
+        )
+        )
+        ),
+    ##
     tags$head(
       # Title in navbar
       tags$style(HTML('.navbar-brand {color: #f5f5f5 !important; font-size: 40px; 
