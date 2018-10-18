@@ -204,17 +204,6 @@ server <- function(input, output) {
     }
   })
   
-  # ### Disable download buttons at the beggining     # Ya no sería necesario, porque se bloquean las pestañas
-  # shinyjs::disable("download_prec_temp")
-  # observeEvent(input$go, {
-  #   shinyjs::enable("download_prec_temp")
-  # })
-  # 
-  # # shinyjs::disable("download_comparison_table")
-  # # observeEvent(input$go, {
-  # #   shinyjs::enable("download_comparison_table")
-  # # })
-  # # 
   
   ### List of bioclims to compare
   # One to One comparison
@@ -340,10 +329,10 @@ server <- function(input, output) {
   
   output$map <- renderLeaflet(m)
   
-  # create map proxy to make further changes to existing map
+  # Create map proxy to make further changes to existing map
   map <- leafletProxy("map")
   
-  # Code that updates the map depending on study area inputs and selections
+  # Update the map depending on study area inputs and selections
   observe({
     # Extent selected by drawing rectangle
     if (input$extent_type == "map_draw") {
@@ -749,7 +738,7 @@ server <- function(input, output) {
                      rvs$sf_country <- rvs$polySelXY
                    }
                    
-                   ### Divide by 10 some layers (temperature)
+                   ### Divide by 10 some temperature layers to use common units
                    glue::glue("#>>  Transforming temperature layers to regular units of ºC") %>% message
                    for (i in 1:length(rvs$clim_vars)){
                      for (j in names(rvs$clim_vars[[i]])[names(rvs$clim_vars[[i]]) %in% c("bio_1", "bio_2", "bio_4", "bio_5", "bio_6", "bio_7", "bio_8", "bio_9", "bio_10", "bio_11")]){
@@ -870,7 +859,7 @@ server <- function(input, output) {
                    
                    
                    
-                   ########### MAKE THE COMPARISON
+                   ########### COMPARE GCMs
                    
                    glue::glue("#>>> Computing differences between GCMs in temperature and precipitation") %>% message()
                    ### Table of differences
@@ -910,7 +899,8 @@ server <- function(input, output) {
                      dplyr::arrange(Distance)
                    
                    ## Is within confidence intervals?
-                   std_error <- mean(table_scaled$Distance) + sd(table_scaled$Distance)/sqrt(nrow(table_scaled))
+                   # std_error <- mean(table_scaled$Distance) + sd(table_scaled$Distance)/sqrt(nrow(table_scaled))
+                   std_error <- mean(table_scaled$Distance) + 2*sd(table_scaled$Distance)
                    table_scaled <- table_scaled %>%
                      dplyr::mutate(Within_circle = ifelse(Distance <= std_error, TRUE, FALSE))
                    
@@ -951,8 +941,8 @@ server <- function(input, output) {
                                                           rowMeans(na.rm = T)) %>%
                      dplyr::mutate(Distance = raster::pointDistance(c(0, 0),
                                                                     .[,2:3],
-                                                                    lonlat = FALSE)) #%>%
-                   # dplyr::arrange(Distance)
+                                                                    lonlat = FALSE)) 
+                   
                    rvs$table_realunscaled <- table_realunscaled
                    
                    #############################################################################
@@ -984,8 +974,6 @@ server <- function(input, output) {
                      purrr::map_dfc(~ rowMeans(.x[,2:ncol(.x)], na.rm = T)) %>%
                      dplyr::bind_cols(table_diff_unscaled[[1]][,1])
                    
-                   # table_diff_unscaled <- table_diff_unscaled %>%
-                   #   mutate_at(., vars(one_of(paste0("bio_", 1:11))), funs(. / 10))
                    # Combine temperature and precipitation variables separatedly
                    table_unscaled <- tibble::tibble(GCM = table_diff_unscaled %>%
                                                       dplyr::select(GCM) %>% dplyr::pull(GCM),

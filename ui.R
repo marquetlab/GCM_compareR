@@ -2,7 +2,6 @@ library(shiny)
 library(shinythemes)
 library(shinyjs)
 library(shinycssloaders)
-# library(shinysky)
 library(plotly)
 library(leaflet)
 library(leaflet.extras)
@@ -37,7 +36,7 @@ ui <- tagList(
     id = "navbar",
     title = "GCM compareR",
     position = "fixed-top",
-    selected = "intro",  #"scenario"
+    selected = "intro",
     
     ### USER INTERFACE VISUAL OPTIONS
     # Main page tabs
@@ -154,7 +153,6 @@ ui <- tagList(
                                 
                                 ############## Global Circulation Models (GCMs)
                                 div(style="display:inline-block", h5("Global Circulation Models (GCMs)")),
-                                # h6(""),
                                 
                                 div(style="display:inline-block",shiny::actionButton(inputId = "GCMs_button", 
                                                                                      label = "",
@@ -344,7 +342,7 @@ ui <- tagList(
                )
     ),
     
-    ### Selected scenario
+    ### Explore selected GCMs
     tabPanel(title = "EXPLORE SELECTED GCMs",
              value = "selected",
              
