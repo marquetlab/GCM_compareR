@@ -6,14 +6,19 @@ output: html_fragment
 bibliography: biblio.bib
 ---
 
+#### Latest News
+
+**GCM compareR has been inestable for the last few days due to an increase in the amount of people that is using the app. Please, if you experience these issues, you may try again after a while. We are adjusting the server to improve the experience and fix stability in the shortest time possible.**
+
+
 #### GCM compareR
-GCM compareR is a web application developed to assist ecologists, conservationists and policy makers at understanding climate change scenarios and differences between Global Circulation Models (GCMs), and at assisting the triage of subsets of models in an objective and informed manner. GCM compareR is written in R and uses the web app development package shiny. The code of this app can be find in the project's github, <a href = "https://github.com/marquetlab/GCM_compareR" target = "_blank">https://github.com/marquetlab/GCM_compareR</a>.  
+GCM compareR is a web application developed to assist ecologists, conservationists and policy makers at understanding climate change scenarios and differences between Global Circulation Models (GCMs), and at assisting the triage of subsets of models in an objective and informed manner. GCM compareR is written in R and uses the web app development package Shiny. The code of this app can be find in the project's github, <a href = "https://github.com/marquetlab/GCM_compareR" target = "_blank">https://github.com/marquetlab/GCM_compareR</a>.  
 
-The number of GCMs that are accessible to researchers and practitioners has grown large. Concretely, meteorological research centers worldwide have contributed more than 35 different GCMs for four distinct climate change scenarios as part of the Coupled Model Intercomparison Project Phase 5 (CMIP5; [@Taylor2012a]). All these models have shown good performance and skill in predicting historical climatic data, but present differences among them as a result of different sources of uncertainty (including model formulation, resolution and sensitivity to initial conditions, climate noise; [@Flato2013]). GCMs could be ranked by their skill at specific geographic areas, but models that most accurately predict historic data are not necessarily the most useful for making future climate projections [@Knutti2008].  
+Global Circulation Models (GCMs) are key to climate change research. Currently, scientists can chose from a large number of GCMs, as meteorological research centers worldwide have contributed more than 35 different GCMs for four distinct climate change scenarios as part of the Coupled Model Intercomparison Project Phase 5 (CMIP5; [@Taylor2012a]). Projections of future climate from all these models tell a common story, but the spread among them is also significant [@Zappa2017], which is an indicator of the irreducible uncertainty concerning any unverifiable future projection. For this reason, studies have shown that the choice of GCMs in modeling studies is an important source of variability in model outputs [@Thuiller2019]. The situation demands for workflows to help researchers exploring climate change scenarios to increase objectivity and repeatability in research and assure a well judged treatment of uncertainty [@Shepherd2018].
 
-In practice, best practices when conducting any evaluation advice for using multi-model approaches where differences in GCMs projections are adequantely understood and assessed as uncertainty [@Pierce2009, @Flato2013]. Also, and even though the ideal case would use all available GCMs, researchers are often forced to work with a few selected models for computational restrictions [@Barsugli2013]. However, the choice of some GCMs and not other has the potential to influence results [@Synes2011], and thus it should be made following informed and replicable procedures [@Mote2011, @Snover2013, @Vano2015].
+GCM compareR has been developed to play this role in helping researchers approaching GCMs in climate change studies and assist the selection of climate models. The app offers quick access to preloaded CMIP5 downscaled GCMs for the four RCPs [@VanVuuren2011] and allows users to compare their projections for future years. Comparison results are provided as scatterplots and maps where users may learn what makes different any GCM, identify groups of GCMs with similar characteristics (e.g. "colder" or "warmer" in their projection of temperature increase) and define storylines about the future climate [@Zappa2017].
 
-GCM compareR has been design to serve the purpose of informing about differences and similarities between GCMs and climate change scenarios, and of assisting the triage of models that best suit every used needs.
+
 
 ***
 
@@ -21,8 +26,8 @@ GCM compareR has been design to serve the purpose of informing about differences
 #### Use of the App
 GCM compareR contains tabs that might be used from left to right to define a comparison scenario, retrieve results and generate a report with them.  
 
-- The *Intro* tab includes all the information needed to use the app. Move the *Workflow* section to find full details about to use the app, and go to *About* to find information about who developed it.  
-- In *Scenario* you will be able to make all choices: select the GCMs you would like to compare, pick a climate change scenario (year of projection, RCP...) and set the geographic extent of your analysis. Use the *Analyse* button on this tab to trigger the start of the analyses.  
+- The *Intro* tab includes all the information needed to use the app. Move to the *Workflow* section to find full details about how to use the app, and go to *About* to find information about developers.  
+- In the *Scenario* tab you will be able to set up a comparison scenario by making all choices: select the GCMs you would like to compare, pick a climate change scenario (year of projection, RCP...) and set the geographic extent of your analysis. Use the *Analyse* button on this tab to trigger the start of the analyses.  
 - The tabs *Explore selected GCMs*, *Variation from present* and *Variation among futures* will display the results after the calculation is completed. Finally, *Report* will download a report with all the figures produced and some explanatory text.
 
 ***
@@ -36,7 +41,7 @@ GCM compareR contains tabs that might be used from left to right to define a com
 #### Citation  
 Please, if you use GCM compareR as part of your research, cite the app as:  
 
->Fajardo, J, Corcoran, D., Roehrdanz, P, Hannah, P, Marquet, P (2018) GCM compareR: A web application to assess differences and assist in the selection of global circulation models for climate change research (in prep).
+>Fajardo, J, Corcoran, D., Roehrdanz, P, Hannah, P, Marquet, P (2019) GCM compareR: A web application to assess differences and assist in the selection of global circulation models for climate change research (in prep).
   
 ***
   
