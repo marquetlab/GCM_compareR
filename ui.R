@@ -267,9 +267,9 @@ ui <- tagList(
                                                  div(style = "display:inline-block",
                                                      numericInput("xmax", "xmax", 180, min = -180, max = 180, step = 0.5)),
                                                  div(style = "display:inline-block",
-                                                     numericInput("ymin", "ymax", -60, min = -60, max = 90, step = 0.5)),
+                                                     numericInput("ymin", "ymin", -60, min = -60, max = 90, step = 0.5)),
                                                  div(style = "display:inline-block",
-                                                     numericInput("ymax", "ymax", 90, min = -90, max = 90, step = 0.5)),
+                                                     numericInput("ymax", "ymax", 90, min = -60, max = 90, step = 0.5)),
                                                  p(tags$span(style="color:#B64249", "Warning: invalid ranges may cause the app to crash. Do not enter
                                                              xmax or ymax smaller than xmin and ymin (and viceversa). Latitude valid values range from -90 to 60,
                                                              and longitude from -180 to 180.")))#,
