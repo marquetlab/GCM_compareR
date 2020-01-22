@@ -1,3 +1,10 @@
 .httr-oauth
 clim_data
+clim_data_old
+GCM_compareR_offline.zip
+to_delete
+Rmd/.DS_Store
+Rmd/._.DS_Store
+data
+.Rhistory
 .Rproj.user

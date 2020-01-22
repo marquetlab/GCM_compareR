@@ -1,8 +1,10 @@
 # Climatic variables
-# devtools::install_github("ropensci/ccafs")
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(devtools, raster, tidyverse)
+if (!require("ccafs")) install.packages(devtools::install_github("ropensci/ccafs"))
+
 library(ccafs)
-library(raster)
-library(tidyverse)
+
 wgs <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
 
@@ -20,8 +22,8 @@ dir.create("clim_data/ccafs/rds")
 for (res in resolution){
   glue::glue("# Getting data for resolution: {res}") %>% print
   for (year in c(
-    "2050"#,
-    # "2070"
+    "2050",
+    "2070"
     )){
     glue::glue("#  Year: {year}") %>% print
     for (rcp in c("rcp26",

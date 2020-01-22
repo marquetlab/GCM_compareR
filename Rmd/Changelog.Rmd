@@ -1,11 +1,20 @@
 ---
 title: "Changelog"
-output: html_notebook
-editor_options: 
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+editor_options:
   chunk_output_type: inline
 ---
 
 ### Released versions
+
+#### Version 1.0.1 (Jan 20, 2020)
+- Fixes to include reference to the paper and other minor corrections
+
+***
 
 #### Version 1.0.0 (Oct 18, 2018)
 - Release of GCM compareR v1.0.0

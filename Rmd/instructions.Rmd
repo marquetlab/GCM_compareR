@@ -8,20 +8,20 @@ bibliography: biblio.bib
 **1)** Select the parameters that describe a climate change scenario in the tab _Scenario _: 
 
 
-#### Global Circulation Models (GCMs)
+#### General Circulation Models (GCMs)
 
-- <a href = "http://www.ipcc-data.org/guidelines/pages/gcm_guide.html" target = "_blank">Global Circulation Models</a>
+- <a href = "http://www.ipcc-data.org/guidelines/pages/gcm_guide.html" target = "_blank">General Circulation Models</a>
 
 
 - Year
 
 - <a href = "https://en.wikipedia.org/wiki/Representative_Concentration_Pathways" target = "_blank">Representative Concentration Pathways</a>
 
-- <a href = "http://www.worldclim.org/bioclim" target = "_blank">bioclimatic variables</a>
+- <a href = "http://www.worldclim.org/bioclim" target = "_blank">Bioclimatic variables</a>
 
-- <a href = "http://www.ipcc-data.org/guidelines/pages/gcm_guide.html" target = "_blank">Global Circulation Models</a>
+- <a href = "http://www.ipcc-data.org/guidelines/pages/gcm_guide.html" target = "_blank">General Circulation Models</a>
 
-- and a study area of your interest (clic _Apply extent_ to set the extent). 
+- Focal study area (clic _Apply extent_ to set the extent). 
 
 When you are done, press the **START ANALYSIS** button.
 

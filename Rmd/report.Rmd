@@ -27,7 +27,7 @@ bibliography: biblio.bib
 
 This report was automatically generated with the GCM compareR shiny app.
 
-The app is intended at assisting ecologists, conservationists and policy makers in the process of understanding differences between global circulation models (GCMs) projections on a geographic area, and in the triage of subsets of GCMs for their specific needs. It includes options to perform analyses that assess how different are projections from current climatic conditions and among them.
+The app is intended at assisting ecologists, conservationists and policy makers in the process of understanding differences between General Circulation Models (GCMs) projections on a geographic area, and in the triage of subsets of GCMs for their specific needs. It includes options to perform analyses that assess how different are projections from current climatic conditions and among them.
 
 
 ## Note

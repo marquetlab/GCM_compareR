@@ -10,7 +10,7 @@ GCM compareR has been developed by Javier Fajardo, Derek Corcoran, Patrick Roehr
 ***
 
 #### Authors  
-Javier Fajardo  
+<a href = "https://scholar.google.es/citations?user=L30b63UAAAAJ&hl=es&oi=ao" target = "_blank">Javier Fajardo  
 <a href = "https://derek-corcoran-barrios.github.io/" target = "_blank">Derek Corcoran</a>  
 Patrick Roehrdanz  
 Lee Hannah  

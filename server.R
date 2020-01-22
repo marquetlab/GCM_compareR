@@ -1,17 +1,20 @@
-library(shiny)
-library(tidyverse)
-library(kableExtra)
-library(raster)
-library(plotly)
-library(leaflet)
-library(leaflet.extras)
-# Maps
-library(sp)
-library(sf)
-library(rgdal)
-library(fasterize)
-library(maps)
-library(maptools)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(shiny, shinythemes, shinyjs, shinycssloaders, plotly, leaflet, leaflet.extras, shiny, tidyverse, kableExtra, raster, plotly, leaflet, leaflet.extras, sp, sf, rgdal, fasterize, maps, maptools, rgeos)
+
+# library(shiny)
+# library(tidyverse)
+# library(kableExtra)
+# library(raster)
+# library(plotly)
+# library(leaflet)
+# library(leaflet.extras)
+# # Maps
+# library(sp)
+# library(sf)
+# library(rgdal)
+# library(fasterize)
+# library(maps)
+# library(maptools)
 
 # Spatial data
 world <- maps::map("world", fill = TRUE, plot = FALSE)
@@ -654,46 +657,46 @@ server <- function(input, output) {
                    glue::glue("#>>   Loading climatic data") %>% message
                    if(!is.null(input$sel_gcms)){
                      # Load .tif data
-                     # clim_vars_files <- paste0(input$sel_gcms, ".",
-                     #                           input$res_sel,
-                     #                           ".year", input$year_type, ".",
-                     #                           input$rcp_type) %>% 
-                     #   purrr::map(~list.files("clim_data/ccafs/raw_rasters/",
-                     #                               pattern = .x, 
-                     #                               full.names = T)) %>% 
-                     #   purrr::map(~ raster::stack(.x))
-                     # clim_vars_files <- clim_vars_files %>% 
-                     #   purrr::map(~setNames(.x, names(.x) %>% gsub(".*\\.bio","",.) %>% paste0("bio",.)))
-                     
-                     # Load .rds data
-                     clim_vars_files <- paste0("clim_data/ccafs/rds/",
-                                               input$sel_gcms, ".",
+                     clim_vars_files <- paste0(input$sel_gcms, ".",
                                                input$res_sel,
                                                ".year", input$year_type, ".",
-                                               input$rcp_type,
-                                               ".rds") %>%
-                       purrr::map(~ readRDS(.x))
+                                               input$rcp_type) %>%
+                       purrr::map(~list.files("clim_data/ccafs/raw_rasters/",
+                                                   pattern = .x,
+                                                   full.names = T)) %>%
+                       purrr::map(~ raster::stack(.x))
+                     clim_vars_files <- clim_vars_files %>%
+                       purrr::map(~setNames(.x, names(.x) %>% gsub(".*\\.bio","",.) %>% paste0("bio",.)))
+                     
+                     # Load .rds data
+                     # clim_vars_files <- paste0("clim_data/ccafs/rds/",
+                     #                           input$sel_gcms, ".",
+                     #                           input$res_sel,
+                     #                           ".year", input$year_type, ".",
+                     #                           input$rcp_type,
+                     #                           ".rds") %>%
+                     #   purrr::map(~ readRDS(.x))
                    } else {
                      # Load .tif data
-                     # clim_vars_files <- paste0(rvs$def_available_gcms, ".",
-                     #                           input$res_sel,
-                     #                           ".year", input$year_type, ".",
-                     #                           input$rcp_type) %>% 
-                     #   purrr::map(~list.files("clim_data/ccafs/raw_rasters/",
-                     #                         pattern = .x, 
-                     #                         full.names = T)) %>% 
-                     #   purrr::map(~ raster::stack(.x))
-                     # clim_vars_files <- clim_vars_files %>% 
-                     #   purrr::map(~setNames(.x, names(.x) %>% gsub(".*\\.bio","",.) %>% paste0("bio",.)))
-                     
-                     # Load .rds data
-                     clim_vars_files <- paste0("clim_data/ccafs/rds/",
-                                               rvs$def_available_gcms, ".",
+                     clim_vars_files <- paste0(rvs$def_available_gcms, ".",
                                                input$res_sel,
                                                ".year", input$year_type, ".",
-                                               input$rcp_type,
-                                               ".rds") %>%
-                       purrr::map(~ readRDS(.x))
+                                               input$rcp_type) %>%
+                       purrr::map(~list.files("clim_data/ccafs/raw_rasters/",
+                                             pattern = .x,
+                                             full.names = T)) %>%
+                       purrr::map(~ raster::stack(.x))
+                     clim_vars_files <- clim_vars_files %>%
+                       purrr::map(~setNames(.x, names(.x) %>% gsub(".*\\.bio","",.) %>% paste0("bio",.)))
+                     
+                     # Load .rds data
+                     # clim_vars_files <- paste0("clim_data/ccafs/rds/",
+                     #                           rvs$def_available_gcms, ".",
+                     #                           input$res_sel,
+                     #                           ".year", input$year_type, ".",
+                     #                           input$rcp_type,
+                     #                           ".rds") %>%
+                     #   purrr::map(~ readRDS(.x))
                    }
                    rvs$clim_vars_complete <- clim_vars_files %>%
                      magrittr::set_names(input$sel_gcms)
@@ -707,7 +710,7 @@ server <- function(input, output) {
                    # Crop to study area
                    incProgress(amount = 0.1, message = "Cropping to study area")
                    req(rvs$polySelXY)
-                   glue::glue("#>>   Cropping to study area") %>% message
+                   glue::glue("#>>   Cropping to study area") %>% message()
                    ## When it is not a polygon
                    if (!is(rvs$polySelXY, "sf")){
                      rvs$clim_vars <- rvs$clim_vars %>%
@@ -754,12 +757,16 @@ server <- function(input, output) {
                    # Load baseline
                    ## Loading .tif data
                    rvs$clim_baseline_complete <- paste0("clim_data/baseline/raw_rasters/baseline.", input$res_sel, ".bio_", 1:19, ".tif") %>% 
-                     stack %>% setNames(names(.) %>% gsub(".*\\.bio","",.) %>% paste0("bio",.))
+                     stack %>% 
+                     setNames(names(.) %>% gsub(".*\\.bio","",.) %>% paste0("bio",.))
+                   
                    ## Loading .rds data
                    # rvs$clim_baseline_complete <- readRDS(paste0("clim_data/baseline/rds/baseline.", input$res_sel, ".rds"))
+                   
                    rvs$clim_baseline <- rvs$clim_baseline_complete %>% 
-                     crop(extent(rvs$clim_vars[[1]])) %>% 
+                     crop(extent(rvs$clim_vars[[1]][[1]])) %>% 
                      mask(rvs$clim_vars[[1]][[1]])
+                   
                    glue::glue("#>>   Subsetting bioclims in baseline") %>% message
                    rvs$clim_baseline <- rvs$clim_baseline %>% 
                      raster::subset(c(rvs$bio_vars_x2, rvs$bio_vars_y2))

@@ -1,7 +1,9 @@
 ---
 title: "Map Instructions"
-output: html_notebook
-editor_options: 
+output:
+  html_document:
+    df_print: paged
+editor_options:
   chunk_output_type: inline
 ---
 
@@ -17,7 +19,7 @@ Use the options on the left to define your climate change scenario.
 
 - If you want to change default bioclimatic variables to compare, clic on *Bioclimatic variabesl (change default)* to unfold the variable names. Pick as many as you want, but at least one temperature variable and one precipitation. If you pick 1+1 variables, the app will compare them directly. On the contrary, if you select more 2 or more temperature or precipitation variables, the app will combine them to produce a figure of "accumulated" temperature variance against "accumulated" precipitation variance.
 
-- Likewise, click *Global Circulatio Models (unselect)* to unfold options. Select the GCMs that you desire to compare.
+- Likewise, click *General Circulatio Models (unselect)* to unfold options. Select the GCMs that you desire to compare.
 
 - Click *Data resolution* to select your prefered resolution. Beware that computing times can get long if a small resolution is used. We recommend starting with the coarser resolution, and then move to smaller ones.
 

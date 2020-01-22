@@ -1,10 +1,13 @@
-library(shiny)
-library(shinythemes)
-library(shinyjs)
-library(shinycssloaders)
-library(plotly)
-library(leaflet)
-library(leaflet.extras)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(shiny, shinythemes, shinyjs, shinycssloaders, plotly, leaflet, leaflet.extras, shiny, tidyverse, kableExtra, raster, plotly, leaflet, leaflet.extras, sp, sf, rgdal, fasterize, maps, maptools)
+
+# library(shiny)
+# library(shinythemes)
+# # library(shinyjs)
+# library(shinycssloaders)
+# library(plotly)
+# library(leaflet)
+# library(leaflet.extras)
 
 
 ##############################################################################################################################################################################
@@ -151,8 +154,8 @@ ui <- tagList(
                
                conditionalPanel("input.map_panel != 'scenario_individual'",
                                 
-                                ############## Global Circulation Models (GCMs)
-                                div(style="display:inline-block", h5("Global Circulation Models (GCMs)")),
+                                ############## General Circulation Models (GCMs)
+                                div(style="display:inline-block", h5("General Circulation Models (GCMs)")),
                                 
                                 div(style="display:inline-block",shiny::actionButton(inputId = "GCMs_button", 
                                                                                      label = "",
