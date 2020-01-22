@@ -142,11 +142,12 @@ Lee Hannah
 
 #### Climatic data
 
-This application uses downscaled climate data published by the
-<a href = "http://ccafs-climate.org/" target = "_blank">Research Program
-on Climate Change, Agriculture and Food Security (CCAFS)</a>. All the
-raster data used by GCM compareR is available from their package
-(Chamberlain 2017).
+This application uses downscaled climate data published by CGIAR-CCAFS
+(Research Program on Climate Change, Agriculture and Food Security)
+under CC 4.0 license. All the raster data used by GCM compareR is
+available from their
+<a href = "http://ccafs-climate.org/" target = "_blank">data portal</a>
+and their R package (Chamberlain 2017).
 
 -----
 
