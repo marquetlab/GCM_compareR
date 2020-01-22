@@ -13,6 +13,7 @@ editor_options:
 
 #### Version 1.0.1 (Jan 20, 2020)
 - Fixes to include reference to the paper and other minor corrections
+- Version accepted in Methods of Ecology and Evolution
 
 ***
 
