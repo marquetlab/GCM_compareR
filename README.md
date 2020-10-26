@@ -8,7 +8,7 @@ at assisting the triage of subsets of models in an objective and
 informed manner. GCM compareR is written in R and uses the web app
 development package Shiny. The code of this app can be find in the
 project’s github,
-<a href = "https://github.com/marquetlab/GCM_compareR" target = "_blank">https://github.com/marquetlab/GCM\_compareR</a>.
+<a href = "https://github.com/marquetlab/GCM_compareR" target = "_blank">https://github.com/marquetlab/GCM_compareR</a>.
 
 General Circulation Models (GCMs) are key to climate change research.
 Currently, scientists can chose from a large number of GCMs, as
@@ -86,9 +86,7 @@ You need to be connected online to use the app. When an analysis is run
 in the app, many climatic layers in raster format are loaded and
 analysed in the background, and these layers encompass several Gb of
 hard drive space. However, if you prefer to use the app offline, you may
-download it (including climatic layers) from here: (~4.3 Gb)
-
-<http://bit.ly/GCM_compareR_offline> (copy and paste the link in your
+download it (including climatic layers) from the following location: (~4.3 Gb) <http://bit.ly/GCM_compareR_offline> (copy and paste the link in your
 browser)
 
 To run the app locally you need to have
