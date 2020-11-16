@@ -1,16 +1,14 @@
 
-#### GCM compareR
+#### GCM_compareR
 
-GCM compareR is a web application developed to assist ecologists,
+`GCM_compareR` is a web application developed to assist ecologists,
 conservationists and policy makers at understanding climate change
 scenarios and differences between General Circulation Models (GCMs), and
 at assisting the triage of subsets of models in an objective and
 informed manner. GCM compareR is written in R and uses the web app
-development package Shiny. The code of this app can be find in the
-project’s github,
-<a href = "https://github.com/marquetlab/GCM_compareR" target = "_blank">https://github.com/marquetlab/GCM\_compareR</a>.
+development package Shiny. This repository contains the development version of the software and web application.
 
-General Circulation Models (GCMs) are key to climate change research.
+General Circulation Models (GCMs) are commonly used for exploring scenarios of climate change.
 Currently, scientists can chose from a large number of GCMs, as
 meteorological research centers worldwide have contributed more than 35
 different GCMs for four distinct climate change scenarios as part of the
@@ -26,7 +24,7 @@ climate change scenarios to increase objectivity and repeatability in
 research and assure a well judged treatment of uncertainty (Shepherd et
 al. 2018).
 
-GCM compareR has been developed to play this role in helping researchers
+`GCM_compareR` has been developed to play this role in helping researchers
 approaching GCMs in climate change studies and assist the selection of
 climate models. The app offers quick access to preloaded CMIP5
 downscaled GCMs for the four RCPs (Vuuren et al. 2011) and allows users
@@ -43,13 +41,13 @@ and define storylines about the future climate (Zappa and Shepherd
 
 >   - New publication usable for citation (Jan 2020)
 
->   - Release of GCM compareR (Sep 26, 2018)
+>   - Release of `GCM compareR` (Sep 26, 2018)
 
 -----
 
 #### Use of the App
 
-GCM compareR contains tabs that might be used from left to right to
+`GCM_compareR` compareR contains tabs that might be used from left to right to
 define a comparison scenario, retrieve results and generate a report
 with them.
 
@@ -70,7 +68,7 @@ with them.
 
 #### Citation
 
-Please, if you use GCM compareR as part of your research, cite the app
+Please, if you use `GCM_compareR` as part of your research, cite the app
 as:
 
 > Fajardo, J, Corcoran, D., Roehrdanz, P, Hannah, P, Marquet, P (in
@@ -86,9 +84,7 @@ You need to be connected online to use the app. When an analysis is run
 in the app, many climatic layers in raster format are loaded and
 analysed in the background, and these layers encompass several Gb of
 hard drive space. However, if you prefer to use the app offline, you may
-download it (including climatic layers) from here: (~4.3 Gb)
-
-<http://bit.ly/GCM_compareR_offline> (copy and paste the link in your
+download it (including climatic layers) from the following location: (~4.3 Gb) <http://bit.ly/GCM_compareR_offline> (copy and paste the link in your
 browser)
 
 To run the app locally you need to have
@@ -113,7 +109,7 @@ create an issue on
 
 #### Development
 
-GCM compareR has been developed by Javier Fajardo, Derek Corcoran,
+`GCM_compareR` has been developed by Javier Fajardo, Derek Corcoran,
 Patrick Roehrdanz, Lee Hannah and Pablo Marquet in
 <a href = "http://marquet.cl/" target = "_blank">Marquet Lab</a> in
 Pontificia Universidad Católica de Chile, in Santiago de Chile. It was
@@ -144,7 +140,7 @@ Lee Hannah
 
 This application uses downscaled climate data published by CGIAR-CCAFS
 (Research Program on Climate Change, Agriculture and Food Security)
-under CC 4.0 license. All the raster data used by GCM compareR is
+under CC 4.0 license. All the raster data used by `GCM_compareR` is
 available from their
 <a href = "http://ccafs-climate.org/" target = "_blank">data portal</a>
 and their R package (Chamberlain 2017).
